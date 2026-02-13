@@ -1,0 +1,1338 @@
+<!-- melio-auth.html -->
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melio — Вход</title>
+    <style>
+        /* ============================================
+           MELIO AUTH — STYLES
+           ============================================ */
+
+        /* --- CSS Variables --- */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a2e;
+            --bg-card: #16162a;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888a8;
+            --text-muted: #555570;
+            --accent-purple: #7c3aed;
+            --accent-purple-light: #a855f7;
+            --accent-cyan: #06b6d4;
+            --accent-cyan-light: #22d3ee;
+            --accent-gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+            --accent-glow-purple: 0 0 20px rgba(124, 58, 237, 0.4);
+            --accent-glow-cyan: 0 0 20px rgba(6, 182, 212, 0.4);
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border-color: rgba(124, 58, 237, 0.2);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 20px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        [data-theme="light"] {
+            --bg-primary: #f0f0f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555570;
+            --text-muted: #8888a8;
+            --border-color: rgba(124, 58, 237, 0.15);
+        }
+
+        /* --- Reset & Base --- */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: var(--font-main);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            overflow: hidden;
+        }
+
+        /* --- Animated Background --- */
+        .auth-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .auth-bg::before {
+            content: '';
+            position: absolute;
+            width: 600px; height: 600px;
+            background: radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+            top: -200px; left: -200px;
+            animation: floatOrb1 15s ease-in-out infinite;
+        }
+
+        .auth-bg::after {
+            content: '';
+            position: absolute;
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%);
+            bottom: -200px; right: -200px;
+            animation: floatOrb2 18s ease-in-out infinite;
+        }
+
+        @keyframes floatOrb1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(100px, 50px) scale(1.1); }
+            66% { transform: translate(50px, 100px) scale(0.9); }
+        }
+
+        @keyframes floatOrb2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(-80px, -60px) scale(1.15); }
+            66% { transform: translate(-40px, -80px) scale(0.95); }
+        }
+
+        /* --- Grid Overlay --- */
+        .grid-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-image:
+                linear-gradient(rgba(124,58,237,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(124,58,237,0.03) 1px, transparent 1px);
+            background-size: 60px 60px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* --- Auth Container --- */
+        .auth-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-lg);
+            padding: 48px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow:
+                0 25px 60px rgba(0,0,0,0.5),
+                0 0 40px rgba(124,58,237,0.08),
+                inset 0 1px 0 rgba(255,255,255,0.05);
+            backdrop-filter: blur(20px);
+            animation: cardAppear 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes cardAppear {
+            0% {
+                opacity: 0;
+                transform: translateY(30px) scale(0.95);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* --- Logo --- */
+        .auth-logo {
+            text-align: center;
+            margin-bottom: 36px;
+        }
+
+        .auth-logo h1 {
+            font-size: 42px;
+            font-weight: 800;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -1px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .auth-logo h1::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 40px;
+            height: 3px;
+            background: var(--accent-gradient);
+            border-radius: 2px;
+        }
+
+        .auth-logo p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-top: 12px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        /* --- Tab Switcher --- */
+        .auth-tabs {
+            display: flex;
+            background: var(--bg-primary);
+            border-radius: var(--border-radius);
+            padding: 4px;
+            margin-bottom: 32px;
+            position: relative;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            cursor: pointer;
+            border-radius: var(--border-radius-sm);
+            transition: all var(--transition-fast);
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-tab.active {
+            color: #fff;
+        }
+
+        .auth-tab-indicator {
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: calc(50% - 4px);
+            height: calc(100% - 8px);
+            background: var(--accent-gradient);
+            border-radius: var(--border-radius-sm);
+            transition: transform var(--transition-normal);
+            box-shadow: var(--accent-glow-purple);
+        }
+
+        .auth-tab-indicator.right {
+            transform: translateX(100%);
+        }
+
+        /* --- Form --- */
+        .auth-form {
+            display: none;
+            flex-direction: column;
+            gap: 20px;
+            animation: formFade 0.3s ease;
+        }
+
+        .auth-form.active {
+            display: flex;
+        }
+
+        @keyframes formFade {
+            0% { opacity: 0; transform: translateX(10px); }
+            100% { opacity: 1; transform: translateX(0); }
+        }
+
+        /* --- Input Group --- */
+        .input-group {
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .input-group .input-wrapper {
+            position: relative;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: var(--font-main);
+            transition: all var(--transition-fast);
+            outline: none;
+        }
+
+        .input-group input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .input-group input:focus {
+            border-color: var(--accent-purple);
+            box-shadow: 0 0 0 3px rgba(124,58,237,0.15);
+        }
+
+        .input-group input.error {
+            border-color: var(--danger);
+            box-shadow: 0 0 0 3px rgba(239,68,68,0.15);
+        }
+
+        .input-group .input-icon {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 18px;
+            pointer-events: none;
+        }
+
+        .input-group .error-text {
+            font-size: 12px;
+            color: var(--danger);
+            margin-top: 6px;
+            display: none;
+            animation: errorShake 0.3s ease;
+        }
+
+        .input-group .error-text.visible {
+            display: block;
+        }
+
+        @keyframes errorShake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .input-optional {
+            font-size: 11px;
+            color: var(--text-muted);
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+            margin-left: 6px;
+        }
+
+        /* --- Password Toggle --- */
+        .password-toggle {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 18px;
+            padding: 4px;
+            transition: color var(--transition-fast);
+            pointer-events: all;
+        }
+
+        .password-toggle:hover {
+            color: var(--accent-purple-light);
+        }
+
+        /* --- Submit Button --- */
+        .btn-primary {
+            width: 100%;
+            padding: 15px;
+            background: var(--accent-gradient);
+            border: none;
+            border-radius: var(--border-radius-sm);
+            color: #fff;
+            font-size: 15px;
+            font-weight: 700;
+            font-family: var(--font-main);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+            letter-spacing: 0.5px;
+            margin-top: 8px;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--accent-glow-purple), 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0; left: -100%;
+            width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            transition: left 0.5s ease;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* --- Loading Spinner --- */
+        .btn-loading .btn-text { visibility: hidden; }
+        .btn-loading::after {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            top: 50%; left: 50%;
+            margin: -10px 0 0 -10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* --- Divider --- */
+        .auth-divider {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: var(--text-muted);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .auth-divider::before,
+        .auth-divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-color);
+        }
+
+        /* --- Toast Notifications --- */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            padding: 14px 20px;
+            border-radius: var(--border-radius-sm);
+            color: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            animation: toastIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 360px;
+            backdrop-filter: blur(10px);
+        }
+
+        .toast.success {
+            background: linear-gradient(135deg, rgba(34,197,94,0.9), rgba(22,163,74,0.9));
+            border: 1px solid rgba(34,197,94,0.3);
+        }
+
+        .toast.error {
+            background: linear-gradient(135deg, rgba(239,68,68,0.9), rgba(220,38,38,0.9));
+            border: 1px solid rgba(239,68,68,0.3);
+        }
+
+        .toast.info {
+            background: linear-gradient(135deg, rgba(124,58,237,0.9), rgba(6,182,212,0.9));
+            border: 1px solid rgba(124,58,237,0.3);
+        }
+
+        .toast-exit {
+            animation: toastOut 0.3s ease forwards;
+        }
+
+        @keyframes toastIn {
+            0% { opacity: 0; transform: translateX(100px) scale(0.9); }
+            100% { opacity: 1; transform: translateX(0) scale(1); }
+        }
+
+        @keyframes toastOut {
+            0% { opacity: 1; transform: translateX(0); }
+            100% { opacity: 0; transform: translateX(100px); }
+        }
+
+        /* --- Particles --- */
+        .particle {
+            position: fixed;
+            width: 4px; height: 4px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 0;
+            animation: particleFloat linear infinite;
+        }
+
+        @keyframes particleFloat {
+            0% { opacity: 0; transform: translateY(100vh) scale(0); }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { opacity: 0; transform: translateY(-10vh) scale(1); }
+        }
+
+        /* --- Responsive --- */
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 32px 24px;
+                border-radius: var(--border-radius);
+            }
+
+            .auth-logo h1 {
+                font-size: 34px;
+            }
+        }
+
+        /* --- Version Badge --- */
+        .version-badge {
+            position: fixed;
+            bottom: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 1px;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <!-- Background Effects -->
+    <div class="auth-bg"></div>
+    <div class="grid-overlay"></div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Auth Container -->
+    <div class="auth-container">
+        <div class="auth-card">
+            <!-- Logo -->
+            <div class="auth-logo">
+                <h1>Melio</h1>
+                <p>Premium Messenger</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="auth-tabs">
+                <div class="auth-tab-indicator" id="tabIndicator"></div>
+                <button class="auth-tab active" id="tabLogin" onclick="switchTab('login')">Вход</button>
+                <button class="auth-tab" id="tabRegister" onclick="switchTab('register')">Регистрация</button>
+            </div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+                <div class="input-group">
+                    <label for="loginName">Имя пользователя</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="loginName"
+                            placeholder="Введите имя или username"
+                            autocomplete="username"
+                        >
+                        <span class="input-icon">👤</span>
+                    </div>
+                    <div class="error-text" id="loginNameError">Введите имя пользователя</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="loginPassword">Пароль</label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="loginPassword"
+                            placeholder="Введите пароль"
+                            autocomplete="current-password"
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword('loginPassword', this)">👁</button>
+                    </div>
+                    <div class="error-text" id="loginPasswordError">Введите пароль</div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="loginBtn">
+                    <span class="btn-text">Войти в Melio</span>
+                </button>
+            </form>
+
+            <!-- Register Form -->
+            <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+                <div class="input-group">
+                    <label for="regName">Имя <span style="color:var(--danger)">*</span></label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="regName"
+                            placeholder="Ваше имя"
+                            autocomplete="name"
+                        >
+                        <span class="input-icon">👤</span>
+                    </div>
+                    <div class="error-text" id="regNameError">Имя обязательно (мин. 2 символа)</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="regUsername">
+                        Username
+                        <span class="input-optional">(необязательно)</span>
+                    </label>
+                    <div class="input-wrapper">
+                        <input
+                            type="text"
+                            id="regUsername"
+                            placeholder="@username"
+                            autocomplete="username"
+                        >
+                        <span class="input-icon">@</span>
+                    </div>
+                    <div class="error-text" id="regUsernameError">Username уже занят</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="regPassword">Пароль <span style="color:var(--danger)">*</span></label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="regPassword"
+                            placeholder="Минимум 6 символов"
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword('regPassword', this)">👁</button>
+                    </div>
+                    <div class="error-text" id="regPasswordError">Пароль должен быть не менее 6 символов</div>
+                </div>
+
+                <div class="input-group">
+                    <label for="regPasswordConfirm">Подтвердите пароль <span style="color:var(--danger)">*</span></label>
+                    <div class="input-wrapper">
+                        <input
+                            type="password"
+                            id="regPasswordConfirm"
+                            placeholder="Повторите пароль"
+                            autocomplete="new-password"
+                        >
+                        <button type="button" class="password-toggle" onclick="togglePassword('regPasswordConfirm', this)">👁</button>
+                    </div>
+                    <div class="error-text" id="regPasswordConfirmError">Пароли не совпадают</div>
+                </div>
+
+                <button type="submit" class="btn-primary" id="registerBtn">
+                    <span class="btn-text">Создать аккаунт</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Version -->
+    <div class="version-badge">MELIO v1.0.0</div>
+
+    <script>
+        /* ============================================
+           MELIO AUTH — JAVASCRIPT
+           ============================================
+
+           === DATA SCHEMAS (localStorage) ===
+
+           User: {
+               id: string (uuid),
+               name: string,
+               username: string | null,
+               password: string (hashed ideally, plain for prototype),
+               role: 'user' | 'admin' | 'superadmin',
+               avatar: string | null (URL),
+               verified: boolean,
+               profileAnimation: 'fade-scale' | 'slide-in' | 'rotate-pop',
+               profileBg: { type: 'color' | 'image' | 'gif', value: string },
+               melioPlus: boolean,
+               crystals: number,
+               rewards: Reward[],
+               achievements: Achievement[],
+               nftGifts: string[] (NFT ids),
+               createdAt: string (ISO date),
+               online: boolean
+           }
+
+           Chat: {
+               id: string,
+               type: 'private' | 'group',
+               name: string | null (for groups),
+               members: string[] (user ids),
+               lastMessage: Message | null,
+               createdAt: string
+           }
+
+           Message: {
+               id: string,
+               chatId: string,
+               senderId: string,
+               text: string,
+               status: 'sent' | 'delivered' | 'seen',
+               createdAt: string,
+               deleted: boolean
+           }
+
+           Reward: {
+               id: string,
+               title: string,
+               description: string,
+               grantedBy: string (user id),
+               grantedAt: string
+           }
+
+           Achievement: {
+               id: string,
+               level: number,
+               text: string,
+               grantedBy: string,
+               grantedAt: string
+           }
+
+           NFTGift: {
+               id: string,
+               name: string,
+               rarity: 'common' | 'rare' | 'epic' | 'legendary',
+               image: string (URL),
+               description: string,
+               ownerId: string | null,
+               createdBy: string,
+               createdAt: string
+           }
+
+           CrystalTransaction: {
+               id: string,
+               userId: string,
+               amount: number,
+               type: 'add' | 'subtract' | 'gift',
+               fromUserId: string | null,
+               toUserId: string | null,
+               createdAt: string
+           }
+        */
+
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
+
+        function generateId() {
+            return 'id_' + Date.now().toString(36) + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function getTimestamp() {
+            return new Date().toISOString();
+        }
+
+        // ============================================
+        // API LAYER (localStorage adapter — будет заменён на HTTP)
+        // ============================================
+
+        const api = {
+            // --- Auth ---
+            async register({ name, username, password }) {
+                const users = JSON.parse(localStorage.getItem('melio_users') || '[]');
+
+                // Check duplicate name
+                const nameExists = users.find(u =>
+                    u.name.toLowerCase() === name.toLowerCase()
+                );
+                if (nameExists) {
+                    throw new Error('Пользователь с таким именем уже существует');
+                }
+
+                // Check duplicate username
+                if (username) {
+                    const usernameExists = users.find(u =>
+                        u.username && u.username.toLowerCase() === username.toLowerCase()
+                    );
+                    if (usernameExists) {
+                        throw new Error('Username уже занят');
+                    }
+                }
+
+                const newUser = {
+                    id: generateId(),
+                    name: name.trim(),
+                    username: username ? username.trim().replace(/^@/, '') : null,
+                    password: password,
+                    role: 'user',
+                    avatar: null,
+                    verified: false,
+                    profileAnimation: 'fade-scale',
+                    profileBg: { type: 'color', value: '#1a1a2e' },
+                    melioPlus: false,
+                    crystals: 0,
+                    rewards: [],
+                    achievements: [],
+                    nftGifts: [],
+                    createdAt: getTimestamp(),
+                    online: true
+                };
+
+                users.push(newUser);
+                localStorage.setItem('melio_users', JSON.stringify(users));
+
+                // Set current session
+                const session = { userId: newUser.id, loggedIn: true };
+                localStorage.setItem('melio_session', JSON.stringify(session));
+
+                return { success: true, user: newUser };
+            },
+
+            async login({ nameOrUsername, password }) {
+                const users = JSON.parse(localStorage.getItem('melio_users') || '[]');
+
+                const user = users.find(u =>
+                    (u.name.toLowerCase() === nameOrUsername.toLowerCase() ||
+                     (u.username && u.username.toLowerCase() === nameOrUsername.toLowerCase()))
+                    && u.password === password
+                );
+
+                if (!user) {
+                    throw new Error('Неверное имя пользователя или пароль');
+                }
+
+                // Update online status
+                user.online = true;
+                localStorage.setItem('melio_users', JSON.stringify(users));
+
+                const session = { userId: user.id, loggedIn: true };
+                localStorage.setItem('melio_session', JSON.stringify(session));
+
+                return { success: true, user };
+            },
+
+            async getSession() {
+                const session = JSON.parse(localStorage.getItem('melio_session') || '{}');
+                if (!session.loggedIn) return null;
+
+                const users = JSON.parse(localStorage.getItem('melio_users') || '[]');
+                const user = users.find(u => u.id === session.userId);
+                return user || null;
+            },
+
+            async logout() {
+                const session = JSON.parse(localStorage.getItem('melio_session') || '{}');
+                if (session.userId) {
+                    const users = JSON.parse(localStorage.getItem('melio_users') || '[]');
+                    const user = users.find(u => u.id === session.userId);
+                    if (user) {
+                        user.online = false;
+                        localStorage.setItem('melio_users', JSON.stringify(users));
+                    }
+                }
+                localStorage.removeItem('melio_session');
+                return { success: true };
+            }
+        };
+
+        // ============================================
+        // INIT — Create superadmin & demo data on first launch
+        // ============================================
+
+        function initDemoData() {
+            if (localStorage.getItem('melio_initialized')) return;
+
+            const superAdmin = {
+                id: 'id_superadmin',
+                name: 'Admin',
+                username: 'admin',
+                password: 'admin',
+                role: 'superadmin',
+                avatar: null,
+                verified: true,
+                profileAnimation: 'rotate-pop',
+                profileBg: { type: 'color', value: '#1a1a2e' },
+                melioPlus: true,
+                crystals: 99999,
+                rewards: [
+                    {
+                        id: generateId(),
+                        title: 'Основатель Melio',
+                        description: 'Первый пользователь платформы',
+                        grantedBy: 'id_superadmin',
+                        grantedAt: getTimestamp()
+                    }
+                ],
+                achievements: [
+                    {
+                        id: generateId(),
+                        level: 1,
+                        text: 'Лучший админ приложения',
+                        grantedBy: 'id_superadmin',
+                        grantedAt: getTimestamp()
+                    }
+                ],
+                nftGifts: ['nft_1', 'nft_2'],
+                createdAt: getTimestamp(),
+                online: false
+            };
+
+            const demoUsers = [
+                {
+                    id: 'id_user_alice',
+                    name: 'Alice',
+                    username: 'alice',
+                    password: '123456',
+                    role: 'user',
+                    avatar: null,
+                    verified: false,
+                    profileAnimation: 'fade-scale',
+                    profileBg: { type: 'color', value: '#1a1a2e' },
+                    melioPlus: false,
+                    crystals: 150,
+                    rewards: [],
+                    achievements: [],
+                    nftGifts: ['nft_3'],
+                    createdAt: getTimestamp(),
+                    online: false
+                },
+                {
+                    id: 'id_user_bob',
+                    name: 'Bob',
+                    username: 'bob',
+                    password: '123456',
+                    role: 'admin',
+                    avatar: null,
+                    verified: true,
+                    profileAnimation: 'slide-in',
+                    profileBg: { type: 'color', value: '#1a1a2e' },
+                    melioPlus: true,
+                    crystals: 500,
+                    rewards: [],
+                    achievements: [],
+                    nftGifts: [],
+                    createdAt: getTimestamp(),
+                    online: false
+                },
+                {
+                    id: 'id_user_charlie',
+                    name: 'Charlie',
+                    username: null,
+                    password: '123456',
+                    role: 'user',
+                    avatar: null,
+                    verified: false,
+                    profileAnimation: 'fade-scale',
+                    profileBg: { type: 'color', value: '#1a1a2e' },
+                    melioPlus: false,
+                    crystals: 50,
+                    rewards: [],
+                    achievements: [],
+                    nftGifts: [],
+                    createdAt: getTimestamp(),
+                    online: false
+                },
+                {
+                    id: 'id_user_diana',
+                    name: 'Diana',
+                    username: 'diana_d',
+                    password: '123456',
+                    role: 'user',
+                    avatar: null,
+                    verified: false,
+                    profileAnimation: 'fade-scale',
+                    profileBg: { type: 'color', value: '#1a1a2e' },
+                    melioPlus: false,
+                    crystals: 200,
+                    rewards: [],
+                    achievements: [],
+                    nftGifts: ['nft_4'],
+                    createdAt: getTimestamp(),
+                    online: false
+                }
+            ];
+
+            const allUsers = [superAdmin, ...demoUsers];
+            localStorage.setItem('melio_users', JSON.stringify(allUsers));
+
+            // Demo chats
+            const demoChats = [
+                {
+                    id: 'chat_1',
+                    type: 'private',
+                    name: null,
+                    members: ['id_superadmin', 'id_user_alice'],
+                    lastMessage: null,
+                    createdAt: getTimestamp()
+                },
+                {
+                    id: 'chat_2',
+                    type: 'group',
+                    name: 'Melio Team',
+                    members: ['id_superadmin', 'id_user_bob', 'id_user_alice', 'id_user_charlie'],
+                    lastMessage: null,
+                    createdAt: getTimestamp()
+                }
+            ];
+            localStorage.setItem('melio_chats', JSON.stringify(demoChats));
+
+            // Demo messages
+            const demoMessages = [
+                {
+                    id: generateId(),
+                    chatId: 'chat_1',
+                    senderId: 'id_superadmin',
+                    text: 'Привет, Alice! Добро пожаловать в Melio 🎉',
+                    status: 'seen',
+                    createdAt: new Date(Date.now() - 3600000).toISOString(),
+                    deleted: false
+                },
+                {
+                    id: generateId(),
+                    chatId: 'chat_1',
+                    senderId: 'id_user_alice',
+                    text: 'Спасибо! Отличный мессенджер! 💜',
+                    status: 'seen',
+                    createdAt: new Date(Date.now() - 3500000).toISOString(),
+                    deleted: false
+                },
+                {
+                    id: generateId(),
+                    chatId: 'chat_2',
+                    senderId: 'id_superadmin',
+                    text: 'Всем привет в групповом чате! 🚀',
+                    status: 'seen',
+                    createdAt: new Date(Date.now() - 7200000).toISOString(),
+                    deleted: false
+                },
+                {
+                    id: generateId(),
+                    chatId: 'chat_2',
+                    senderId: 'id_user_bob',
+                    text: 'Отлично, давайте тестировать!',
+                    status: 'seen',
+                    createdAt: new Date(Date.now() - 7000000).toISOString(),
+                    deleted: false
+                },
+                {
+                    id: generateId(),
+                    chatId: 'chat_2',
+                    senderId: 'id_user_charlie',
+                    text: 'Я тоже здесь! 👋',
+                    status: 'sent',
+                    createdAt: new Date(Date.now() - 6800000).toISOString(),
+                    deleted: false
+                }
+            ];
+            localStorage.setItem('melio_messages', JSON.stringify(demoMessages));
+
+            // Update lastMessage for chats
+            demoChats[0].lastMessage = demoMessages[1];
+            demoChats[1].lastMessage = demoMessages[4];
+            localStorage.setItem('melio_chats', JSON.stringify(demoChats));
+
+            // Demo NFTs
+            const demoNFTs = [
+                {
+                    id: 'nft_1',
+                    name: 'Purple Crystal',
+                    rarity: 'legendary',
+                    image: '',
+                    description: 'Легендарный фиолетовый кристалл, символ основателя',
+                    ownerId: 'id_superadmin',
+                    createdBy: 'id_superadmin',
+                    createdAt: getTimestamp()
+                },
+                {
+                    id: 'nft_2',
+                    name: 'Cyber Shield',
+                    rarity: 'epic',
+                    image: '',
+                    description: 'Щит защитника мессенджера',
+                    ownerId: 'id_superadmin',
+                    createdBy: 'id_superadmin',
+                    createdAt: getTimestamp()
+                },
+                {
+                    id: 'nft_3',
+                    name: 'Star Dust',
+                    rarity: 'rare',
+                    image: '',
+                    description: 'Звёздная пыль вселенной Melio',
+                    ownerId: 'id_user_alice',
+                    createdBy: 'id_superadmin',
+                    createdAt: getTimestamp()
+                },
+                {
+                    id: 'nft_4',
+                    name: 'Rookie Badge',
+                    rarity: 'common',
+                    image: '',
+                    description: 'Знак нового пользователя',
+                    ownerId: 'id_user_diana',
+                    createdBy: 'id_superadmin',
+                    createdAt: getTimestamp()
+                },
+                {
+                    id: 'nft_5',
+                    name: 'Neon Heart',
+                    rarity: 'epic',
+                    image: '',
+                    description: 'Сердце неонового города',
+                    ownerId: null,
+                    createdBy: 'id_superadmin',
+                    createdAt: getTimestamp()
+                }
+            ];
+            localStorage.setItem('melio_nfts', JSON.stringify(demoNFTs));
+
+            // Crystal transactions log
+            localStorage.setItem('melio_crystal_transactions', JSON.stringify([]));
+
+            localStorage.setItem('melio_initialized', 'true');
+            console.log('✅ Melio demo data initialized');
+        }
+
+        // ============================================
+        // UI FUNCTIONS
+        // ============================================
+
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabLogin = document.getElementById('tabLogin');
+            const tabRegister = document.getElementById('tabRegister');
+            const indicator = document.getElementById('tabIndicator');
+
+            clearErrors();
+
+            if (tab === 'login') {
+                loginForm.classList.add('active');
+                registerForm.classList.remove('active');
+                tabLogin.classList.add('active');
+                tabRegister.classList.remove('active');
+                indicator.classList.remove('right');
+            } else {
+                loginForm.classList.remove('active');
+                registerForm.classList.add('active');
+                tabLogin.classList.remove('active');
+                tabRegister.classList.add('active');
+                indicator.classList.add('right');
+            }
+        }
+
+        function togglePassword(inputId, btn) {
+            const input = document.getElementById(inputId);
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.textContent = '🙈';
+            } else {
+                input.type = 'password';
+                btn.textContent = '👁';
+            }
+        }
+
+        function showError(elementId, message) {
+            const el = document.getElementById(elementId);
+            if (message) el.textContent = message;
+            el.classList.add('visible');
+            const input = el.parentElement.querySelector('input');
+            if (input) input.classList.add('error');
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error-text').forEach(el => {
+                el.classList.remove('visible');
+            });
+            document.querySelectorAll('input.error').forEach(el => {
+                el.classList.remove('error');
+            });
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'info', duration = 3000) {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            const icons = { success: '✅', error: '❌', info: '💎' };
+            toast.innerHTML = `<span>${icons[type] || '💎'}</span><span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('toast-exit');
+                setTimeout(() => toast.remove(), 300);
+            }, duration);
+        }
+
+        // ============================================
+        // FORM HANDLERS
+        // ============================================
+
+        async function handleLogin(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const nameOrUsername = document.getElementById('loginName').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            let valid = true;
+
+            if (!nameOrUsername) {
+                showError('loginNameError');
+                valid = false;
+            }
+            if (!password) {
+                showError('loginPasswordError');
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            const btn = document.getElementById('loginBtn');
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+
+            try {
+                // Simulate network delay
+                await new Promise(r => setTimeout(r, 800));
+
+                const result = await api.login({ nameOrUsername, password });
+
+                showToast(`Добро пожаловать, ${result.user.name}!`, 'success');
+
+                // Redirect to main app
+                setTimeout(() => {
+                    window.location.href = 'melio-app.html';
+                }, 600);
+
+            } catch (err) {
+                showToast(err.message, 'error');
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+            }
+        }
+
+        async function handleRegister(e) {
+            e.preventDefault();
+            clearErrors();
+
+            const name = document.getElementById('regName').value.trim();
+            const username = document.getElementById('regUsername').value.trim();
+            const password = document.getElementById('regPassword').value;
+            const passwordConfirm = document.getElementById('regPasswordConfirm').value;
+
+            let valid = true;
+
+            if (!name || name.length < 2) {
+                showError('regNameError');
+                valid = false;
+            }
+            if (password.length < 6) {
+                showError('regPasswordError');
+                valid = false;
+            }
+            if (password !== passwordConfirm) {
+                showError('regPasswordConfirmError');
+                valid = false;
+            }
+
+            if (!valid) return;
+
+            const btn = document.getElementById('registerBtn');
+            btn.classList.add('btn-loading');
+            btn.disabled = true;
+
+            try {
+                await new Promise(r => setTimeout(r, 800));
+
+                const result = await api.register({ name, username: username || null, password });
+
+                showToast('Аккаунт создан! Добро пожаловать в Melio! 🎉', 'success');
+
+                setTimeout(() => {
+                    window.location.href = 'melio-app.html';
+                }, 600);
+
+            } catch (err) {
+                showToast(err.message, 'error');
+
+                if (err.message.includes('Username')) {
+                    showError('regUsernameError');
+                }
+
+                btn.classList.remove('btn-loading');
+                btn.disabled = false;
+            }
+        }
+
+        // ============================================
+        // PARTICLES EFFECT
+        // ============================================
+
+        function createParticles() {
+            const colors = ['#7c3aed', '#06b6d4', '#a855f7', '#22d3ee'];
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + 'vw';
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDuration = (8 + Math.random() * 12) + 's';
+                particle.style.animationDelay = Math.random() * 10 + 's';
+                particle.style.width = (2 + Math.random() * 4) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.opacity = 0.3 + Math.random() * 0.4;
+                document.body.appendChild(particle);
+            }
+        }
+
+        // ============================================
+        // INIT
+        // ============================================
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            initDemoData();
+            createParticles();
+
+            // Check if already logged in
+            const currentUser = await api.getSession();
+            if (currentUser) {
+                window.location.href = 'melio-app.html';
+            }
+        });
+    </script>
+</body>
+</html>

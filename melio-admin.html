@@ -1,0 +1,627 @@
+<!-- melio-admin.html -->
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melio — Админ-панель</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a2e;
+            --bg-card: #16162a;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888a8;
+            --text-muted: #555570;
+            --accent-purple: #7c3aed;
+            --accent-purple-light: #a855f7;
+            --accent-cyan: #06b6d4;
+            --accent-cyan-light: #22d3ee;
+            --accent-gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+            --accent-glow-purple: 0 0 20px rgba(124, 58, 237, 0.4);
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border-color: rgba(124, 58, 237, 0.2);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 20px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f0f0f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555570;
+            --text-muted: #8888a8;
+            --border-color: rgba(124, 58, 237, 0.15);
+        }
+
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%;font-family:var(--font-main);background:var(--bg-primary);color:var(--text-primary);overflow-x:hidden;overflow-y:auto}
+        body::-webkit-scrollbar{width:6px}
+        body::-webkit-scrollbar-track{background:transparent}
+        body::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:4px}
+        button{font-family:var(--font-main);cursor:pointer}
+
+        .app-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden}
+        .app-bg::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.15) 0%,transparent 70%);top:-200px;left:-200px;animation:floatOrb1 15s ease-in-out infinite}
+        .app-bg::after{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(6,182,212,0.12) 0%,transparent 70%);bottom:-200px;right:-200px;animation:floatOrb2 18s ease-in-out infinite}
+        @keyframes floatOrb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(100px,50px) scale(1.1)}66%{transform:translate(50px,100px) scale(0.9)}}
+        @keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-80px,-60px) scale(1.15)}66%{transform:translate(-40px,-80px) scale(0.95)}}
+        .grid-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(124,58,237,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.03) 1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+        .particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:particleFloat linear infinite}
+        @keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
+
+        .toast-container{position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:10px}
+        .toast{padding:14px 20px;border-radius:var(--border-radius-sm);color:#fff;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,0.4);animation:toastIn 0.4s cubic-bezier(0.16,1,0.3,1);display:flex;align-items:center;gap:10px;max-width:360px;backdrop-filter:blur(10px)}
+        .toast.success{background:linear-gradient(135deg,rgba(34,197,94,0.9),rgba(22,163,74,0.9));border:1px solid rgba(34,197,94,0.3)}
+        .toast.error{background:linear-gradient(135deg,rgba(239,68,68,0.9),rgba(220,38,38,0.9));border:1px solid rgba(239,68,68,0.3)}
+        .toast.info{background:linear-gradient(135deg,rgba(124,58,237,0.9),rgba(6,182,212,0.9));border:1px solid rgba(124,58,237,0.3)}
+        .toast-exit{animation:toastOut 0.3s ease forwards}
+        @keyframes toastIn{0%{opacity:0;transform:translateX(100px) scale(0.9)}100%{opacity:1;transform:translateX(0) scale(1)}}
+        @keyframes toastOut{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(100px)}}
+
+        .top-bar{position:sticky;top:0;z-index:10;padding:12px 20px;background:var(--bg-secondary);border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:12px;backdrop-filter:blur(16px)}
+        .back-btn{width:40px;height:40px;border-radius:var(--border-radius-sm);background:none;border:none;color:var(--text-secondary);font-size:20px;display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast)}
+        .back-btn:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+        .back-btn:active{transform:scale(0.93)}
+        .top-bar-title{font-size:17px;font-weight:700;flex:1}
+        .top-bar-badge{font-size:10px;padding:3px 10px;background:linear-gradient(135deg,#f59e0b,#fbbf24);border-radius:10px;color:#000;font-weight:700;letter-spacing:0.3px}
+
+        .admin-container{position:relative;z-index:1;max-width:800px;margin:0 auto;padding:20px 16px 40px;opacity:0;animation:pageAppear 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s forwards}
+        @keyframes pageAppear{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+
+        /* STATS GRID */
+        .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-bottom:28px}
+        .stat-card{padding:18px 14px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);text-align:center;transition:all var(--transition-fast);box-shadow:0 4px 16px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);position:relative;overflow:hidden}
+        .stat-card:hover{border-color:var(--accent-purple);transform:translateY(-2px)}
+        .stat-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+        .stat-card.purple::before{background:var(--accent-gradient)}
+        .stat-card.cyan::before{background:linear-gradient(135deg,var(--accent-cyan),var(--accent-cyan-light))}
+        .stat-card.gold::before{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+        .stat-card.green::before{background:linear-gradient(135deg,#22c55e,#4ade80)}
+        .stat-icon{font-size:28px;margin-bottom:6px;display:block}
+        .stat-value{font-size:24px;font-weight:800;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+        .stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+
+        /* TABS */
+        .admin-tabs{display:flex;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:4px;margin-bottom:24px;position:relative;overflow-x:auto}
+        .admin-tabs::-webkit-scrollbar{height:0}
+        .admin-tab{flex:1;padding:11px 6px;text-align:center;font-size:12px;font-weight:600;color:var(--text-muted);background:none;border:none;border-radius:var(--border-radius-sm);transition:all var(--transition-fast);position:relative;z-index:1;white-space:nowrap;min-width:0}
+        .admin-tab:hover{color:var(--text-secondary)}
+        .admin-tab.active{color:#fff}
+        .admin-tab-indicator{position:absolute;top:4px;height:calc(100% - 8px);background:var(--accent-gradient);border-radius:var(--border-radius-sm);transition:all 0.35s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--accent-glow-purple)}
+
+        .tab-content{display:none}
+        .tab-content.active{display:block;animation:tabFade 0.3s ease}
+        @keyframes tabFade{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+
+        /* SEARCH */
+        .admin-search{margin-bottom:16px;position:relative}
+        .admin-search input{width:100%;padding:12px 16px 12px 42px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-sm);color:var(--text-primary);font-size:14px;font-family:var(--font-main);outline:none;transition:all var(--transition-fast)}
+        .admin-search input::placeholder{color:var(--text-muted)}
+        .admin-search input:focus{border-color:var(--accent-purple);box-shadow:0 0 0 3px rgba(124,58,237,0.15)}
+        .admin-search .s-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);font-size:16px;color:var(--text-muted);pointer-events:none}
+
+        /* USER TABLE */
+        .user-list{display:flex;flex-direction:column;gap:6px}
+        .user-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-sm);transition:all var(--transition-fast);cursor:pointer}
+        .user-row:hover{border-color:var(--accent-purple);transform:translateX(4px)}
+        .user-row:active{transform:translateX(2px)}
+        .ur-avatar{width:42px;height:42px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;color:#fff;flex-shrink:0;overflow:visible;position:relative}
+        .ur-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .ur-avatar.plus-ring{box-shadow:0 0 0 2px var(--bg-card),0 0 0 4px var(--accent-purple)}
+        .ur-online{position:absolute;bottom:0;right:0;width:12px;height:12px;border-radius:50%;border:2px solid var(--bg-card);z-index:2}
+        .ur-online.on{background:var(--success)}
+        .ur-online.off{background:var(--text-muted)}
+        .ur-info{flex:1;min-width:0}
+        .ur-name{font-size:14px;font-weight:600;display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+        .ur-sub{font-size:12px;color:var(--text-muted);margin-top:1px}
+        .ur-badges{display:flex;gap:6px;flex-shrink:0;align-items:center;flex-wrap:wrap}
+        .ur-role-badge{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:600}
+        .role-user{background:var(--bg-tertiary);color:var(--text-secondary)}
+        .role-admin{background:rgba(124,58,237,0.15);color:var(--accent-purple-light)}
+        .role-superadmin{background:rgba(234,179,8,0.12);color:var(--warning)}
+        .ur-crystals{font-size:13px;color:var(--accent-cyan-light);font-weight:600}
+        .verified-badge{width:14px;height:14px;flex-shrink:0}
+        .plus-badge{font-size:8px;padding:1px 5px;background:var(--accent-gradient);border-radius:8px;color:#fff;font-weight:700;flex-shrink:0}
+
+        /* ACTION BUTTONS ROW */
+        .action-row{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+        .act-btn{padding:6px 12px;border-radius:var(--border-radius-sm);border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);font-size:11px;font-weight:600;font-family:var(--font-main);transition:all var(--transition-fast);display:flex;align-items:center;gap:4px}
+        .act-btn:hover{border-color:var(--accent-purple);transform:translateY(-1px)}
+        .act-btn:active{transform:translateY(0)}
+        .act-btn.danger{color:var(--danger);border-color:rgba(239,68,68,0.2)}
+        .act-btn.danger:hover{background:rgba(239,68,68,0.08);border-color:var(--danger)}
+        .act-btn.primary{background:var(--accent-gradient);border:none;color:#fff}
+        .act-btn.primary:hover{box-shadow:var(--accent-glow-purple)}
+
+        /* MODALS */
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center}
+        .modal-overlay.visible{display:flex}
+        .modal-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-lg);padding:32px;width:90%;max-width:480px;box-shadow:0 25px 60px rgba(0,0,0,0.5);animation:cardAppear 0.5s cubic-bezier(0.16,1,0.3,1);max-height:90vh;overflow-y:auto}
+        @keyframes cardAppear{0%{opacity:0;transform:translateY(30px) scale(0.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+        .modal-title{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+        .modal-close{width:32px;height:32px;border-radius:var(--border-radius-sm);background:var(--bg-primary);border:1px solid var(--border-color);color:var(--text-muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast)}
+        .modal-close:hover{border-color:var(--danger);color:var(--danger)}
+        .form-group{margin-bottom:16px}
+        .form-group label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+        .form-group input,.form-group textarea,.form-group select{width:100%;padding:12px 16px;background:var(--bg-primary);border:1px solid var(--border-color);border-radius:var(--border-radius-sm);color:var(--text-primary);font-size:14px;font-family:var(--font-main);outline:none;transition:all var(--transition-fast)}
+        .form-group textarea{resize:vertical;min-height:60px}
+        .form-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888a8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+        .form-group select option{background:var(--bg-card);color:var(--text-primary)}
+        .form-group input:focus,.form-group textarea:focus,.form-group select:focus{border-color:var(--accent-purple);box-shadow:0 0 0 3px rgba(124,58,237,0.15)}
+        .save-btn{width:100%;padding:14px;background:var(--accent-gradient);border:none;border-radius:var(--border-radius-sm);color:#fff;font-size:15px;font-weight:700;font-family:var(--font-main);cursor:pointer;transition:all var(--transition-fast);margin-top:8px}
+        .save-btn:hover{transform:translateY(-2px);box-shadow:var(--accent-glow-purple)}
+        .save-btn:active{transform:translateY(0)}
+
+        /* USER SELECT LIST */
+        .user-select-list{max-height:280px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+        .user-select-list::-webkit-scrollbar{width:4px}
+        .user-select-list::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:4px}
+        .user-select-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--border-radius-sm);border:none;background:none;color:var(--text-primary);font-family:var(--font-main);font-size:14px;width:100%;text-align:left;transition:background var(--transition-fast)}
+        .user-select-item:hover{background:var(--bg-tertiary)}
+        .us-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+        .us-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .us-info{flex:1;min-width:0}
+        .us-name{font-weight:600;font-size:14px}
+        .us-sub{font-size:12px;color:var(--text-muted)}
+
+        /* CHANNEL LIST */
+        .channel-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-sm);margin-bottom:6px;transition:all var(--transition-fast)}
+        .channel-row:hover{border-color:var(--accent-purple)}
+        .ch-avatar{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#06b6d4,#7c3aed);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;overflow:hidden}
+        .ch-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .ch-info{flex:1;min-width:0}
+        .ch-name{font-size:14px;font-weight:600}
+        .ch-sub{font-size:12px;color:var(--text-muted)}
+
+        /* NFT ROW */
+        .nft-row{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-sm);margin-bottom:6px;transition:all var(--transition-fast)}
+        .nft-row:hover{border-color:var(--accent-purple)}
+        .nft-icon-wrap{width:42px;height:42px;border-radius:var(--border-radius-sm);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+        .nft-icon-wrap.common{background:rgba(136,136,168,0.1)}
+        .nft-icon-wrap.rare{background:rgba(6,182,212,0.1)}
+        .nft-icon-wrap.epic{background:rgba(168,85,247,0.1)}
+        .nft-icon-wrap.legendary{background:rgba(234,179,8,0.1)}
+        .nft-info{flex:1;min-width:0}
+        .nft-name{font-size:14px;font-weight:600}
+        .nft-sub{font-size:12px;color:var(--text-muted)}
+        .nft-rarity-badge{font-size:10px;font-weight:700;text-transform:uppercase;padding:2px 8px;border-radius:8px;flex-shrink:0}
+        .rarity-common{background:rgba(136,136,168,0.15);color:var(--text-secondary)}
+        .rarity-rare{background:rgba(6,182,212,0.15);color:var(--accent-cyan-light)}
+        .rarity-epic{background:rgba(168,85,247,0.15);color:var(--accent-purple-light)}
+        .rarity-legendary{background:rgba(234,179,8,0.15);color:var(--warning)}
+
+        .empty-state{text-align:center;padding:40px 20px;color:var(--text-muted)}
+        .empty-icon{font-size:40px;display:block;margin-bottom:10px}
+        .empty-title{font-size:15px;font-weight:600;color:var(--text-secondary);margin-bottom:4px}
+
+        @media(max-width:600px){
+            .stats-grid{grid-template-columns:repeat(2,1fr)}
+            .ur-badges{display:none}
+            .admin-tab{font-size:11px;padding:10px 4px}
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-bg"></div>
+<div class="grid-overlay"></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div class="top-bar-title">🛡️ Админ-панель</div>
+    <span class="top-bar-badge" id="roleBadge">ADMIN</span>
+</div>
+
+<div class="admin-container">
+
+    <!-- STATS -->
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <!-- TABS -->
+    <div class="admin-tabs" id="adminTabs">
+        <div class="admin-tab-indicator" id="tabIndicator"></div>
+        <button class="admin-tab active" data-tab="users" onclick="switchTab('users')">👤 Юзеры</button>
+        <button class="admin-tab" data-tab="channels" onclick="switchTab('channels')">📢 Каналы</button>
+        <button class="admin-tab" data-tab="nfts" onclick="switchTab('nfts')">🎁 NFT</button>
+        <button class="admin-tab" data-tab="rewards" onclick="switchTab('rewards')">🏆 Награды</button>
+        <button class="admin-tab" data-tab="tools" onclick="switchTab('tools')">🔧 Утилиты</button>
+    </div>
+
+    <!-- TAB: USERS -->
+    <div class="tab-content active" id="tab-users">
+        <div class="admin-search">
+            <span class="s-icon">🔍</span>
+            <input type="text" id="userSearch" placeholder="Поиск по имени или username..." oninput="renderUsers()">
+        </div>
+        <div class="user-list" id="userList"></div>
+    </div>
+
+    <!-- TAB: CHANNELS -->
+    <div class="tab-content" id="tab-channels">
+        <div style="margin-bottom:16px">
+            <button class="act-btn primary" onclick="openCreateChannelModal()">➕ Создать канал</button>
+        </div>
+        <div id="channelList"></div>
+    </div>
+
+    <!-- TAB: NFTS -->
+    <div class="tab-content" id="tab-nfts">
+        <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="act-btn primary" onclick="openCreateNftModal()">➕ Создать NFT</button>
+            <button class="act-btn" onclick="openGiveNftModal()">🎁 Выдать NFT</button>
+        </div>
+        <div id="nftList"></div>
+    </div>
+
+    <!-- TAB: REWARDS -->
+    <div class="tab-content" id="tab-rewards">
+        <div style="margin-bottom:16px;display:flex;gap:8px;flex-wrap:wrap">
+            <button class="act-btn primary" onclick="openGiveRewardModal()">🏆 Выдать награду</button>
+            <button class="act-btn" onclick="openGiveAchievementModal()">⭐ Выдать достижение</button>
+        </div>
+        <div id="rewardLog"></div>
+    </div>
+
+    <!-- TAB: TOOLS -->
+    <div class="tab-content" id="tab-tools">
+        <div style="display:flex;flex-direction:column;gap:8px" id="toolsList"></div>
+    </div>
+
+</div>
+
+<!-- USER ACTIONS MODAL -->
+<div class="modal-overlay" id="userActionsModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">👤 <span id="uaName">—</span></div>
+            <button class="modal-close" onclick="closeModal('userActionsModal')">✕</button>
+        </div>
+        <div id="uaContent"></div>
+    </div>
+</div>
+
+<!-- GIVE CRYSTALS MODAL -->
+<div class="modal-overlay" id="crystalsModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">💎 Кристаллы</div>
+            <button class="modal-close" onclick="closeModal('crystalsModal')">✕</button>
+        </div>
+        <div class="form-group">
+            <label>Пользователь</label>
+            <div id="crystalsUserName" style="font-size:15px;font-weight:600;padding:8px 0">—</div>
+        </div>
+        <div class="form-group">
+            <label>Количество (+ или -)</label>
+            <input type="number" id="crystalsAmount" placeholder="100">
+        </div>
+        <button class="save-btn" onclick="saveCrystals()">💎 Применить</button>
+    </div>
+</div>
+
+<!-- GIVE REWARD MODAL -->
+<div class="modal-overlay" id="rewardModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">🏆 Выдать награду</div>
+            <button class="modal-close" onclick="closeModal('rewardModal')">✕</button>
+        </div>
+        <div class="form-group">
+            <label>Пользователь</label>
+            <select id="rewardUser"></select>
+        </div>
+        <div class="form-group">
+            <label>Название награды</label>
+            <input type="text" id="rewardTitle" placeholder="Лучший пользователь">
+        </div>
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea id="rewardDesc" placeholder="За активность в чатах..."></textarea>
+        </div>
+        <button class="save-btn" onclick="saveReward()">🏆 Выдать</button>
+    </div>
+</div>
+
+<!-- GIVE ACHIEVEMENT MODAL -->
+<div class="modal-overlay" id="achievementModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">⭐ Выдать достижение</div>
+            <button class="modal-close" onclick="closeModal('achievementModal')">✕</button>
+        </div>
+        <div class="form-group">
+            <label>Пользователь</label>
+            <select id="achUser"></select>
+        </div>
+        <div class="form-group">
+            <label>Текст достижения</label>
+            <input type="text" id="achText" placeholder="Первый в рейтинге">
+        </div>
+        <div class="form-group">
+            <label>Уровень (1-10)</label>
+            <input type="number" id="achLevel" placeholder="5" min="1" max="10" value="1">
+        </div>
+        <button class="save-btn" onclick="saveAchievement()">⭐ Выдать</button>
+    </div>
+</div>
+
+<!-- CREATE CHANNEL MODAL -->
+<div class="modal-overlay" id="createChannelModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">📢 Создать канал</div>
+            <button class="modal-close" onclick="closeModal('createChannelModal')">✕</button>
+        </div>
+        <div class="form-group">
+            <label>Название</label>
+            <input type="text" id="chName" placeholder="Мой канал">
+        </div>
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="chUsername" placeholder="@myChannel">
+        </div>
+        <button class="save-btn" onclick="saveChannel()">📢 Создать</button>
+    </div>
+</div>
+
+<!-- CREATE NFT MODAL -->
+<div class="modal-overlay" id="createNftModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">🎁 Создать NFT</div>
+            <button class="modal-close" onclick="closeModal('createNftModal')">✕</button>
+        </div>
+        <div class="form-group">
+            <label>Название</label>
+            <input type="text" id="nftNameInput" placeholder="Crystal Heart">
+        </div>
+        <div class="form-group">
+            <label>Описание</label>
+            <textarea id="nftDescInput" placeholder="Уникальный подарок..."></textarea>
+        </div>
+        <div class="form-group">
+            <label>Редкость</label>
+            <select id="nftRarityInput">
+                <option value="common">💿 Обычный</option>
+                <option value="rare">💠 Редкий</option>
+                <option value="epic">🔮 Эпический</option>
+                <option value="legendary">👑 Легендарный</option>
+            </select>
+        </div>
+        <button class="save-btn" onclick="saveNft()">🎁 Создать</button>
+    </div>
+</div>
+
+<!-- GIVE NFT MODAL -->
+<div class="modal-overlay" id="giveNftModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">🎁 Выдать NFT</div>
+            <button class="modal-close" onclick="closeModal('giveNftModal')">✕</button>
+        </div>
+        <div class="form-group">
+            <label>NFT</label>
+            <select id="giveNftSelect"></select>
+        </div>
+        <div class="form-group">
+            <label>Кому</label>
+            <select id="giveNftUser"></select>
+        </div>
+        <button class="save-btn" onclick="saveGiveNft()">🎁 Выдать</button>
+    </div>
+</div>
+
+<script>
+    var currentUser = null;
+    var allUsers = [];
+    var allChats = [];
+    var allNfts = [];
+    var allMessages = [];
+    var selectedUserId = null;
+
+    var rarityIcons = {common:'💿',rare:'💠',epic:'🔮',legendary:'👑'};
+    var rarityNames = {common:'Обычный',rare:'Редкий',epic:'Эпический',legendary:'Легендарный'};
+
+    function getInitials(n){return n?n.split(' ').map(function(w){return w[0]}).join('').toUpperCase().slice(0,2):'?'}
+    function findUser(id){for(var i=0;i<allUsers.length;i++){if(allUsers[i].id===id)return allUsers[i]}return null}
+    function goBack(){window.location.href='melio-app.html'}
+    function loadTheme(){var t=localStorage.getItem('melio_theme')||'dark';document.documentElement.setAttribute('data-theme',t)}
+    function showToast(msg,type,dur){type=type||'info';dur=dur||3000;var c=document.getElementById('toastContainer');var t=document.createElement('div');t.className='toast '+type;var ic={success:'✅',error:'❌',info:'💎'};t.innerHTML='<span>'+(ic[type]||'💎')+'</span><span>'+msg+'</span>';c.appendChild(t);setTimeout(function(){t.classList.add('toast-exit');setTimeout(function(){t.remove()},300)},dur)}
+    function createParticles(){var colors=['#7c3aed','#06b6d4','#a855f7','#22d3ee'];for(var i=0;i<12;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'vw';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=Math.random()*10+'s';var s=2+Math.random()*4;p.style.width=s+'px';p.style.height=s+'px';p.style.opacity=0.3+Math.random()*0.4;document.body.appendChild(p)}}
+    function closeModal(id){document.getElementById(id).classList.remove('visible')}
+    function openModal(id){document.getElementById(id).classList.add('visible')}
+    function refreshData(){allUsers=JSON.parse(localStorage.getItem('melio_users')||'[]');allChats=JSON.parse(localStorage.getItem('melio_chats')||'[]');allNfts=JSON.parse(localStorage.getItem('melio_nfts')||'[]');allMessages=JSON.parse(localStorage.getItem('melio_messages')||'[]');currentUser=allUsers.find(function(u){return u.id===currentUser.id})}
+    function fillUserSelect(selectId){var sel=document.getElementById(selectId);sel.innerHTML='';allUsers.forEach(function(u){var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.name+(u.username?' (@'+u.username+')':'');sel.appendChild(opt)})}
+
+    /* ===================== STATS ===================== */
+    function renderStats(){
+        var online=allUsers.filter(function(u){return u.online}).length;
+        var channels=allChats.filter(function(c){return c.type==='channel'}).length;
+        var groups=allChats.filter(function(c){return c.type==='group'}).length;
+        document.getElementById('statsGrid').innerHTML=
+            '<div class="stat-card purple"><span class="stat-icon">👤</span><div class="stat-value">'+allUsers.length+'</div><div class="stat-label">Пользователей</div></div>'+
+            '<div class="stat-card green"><span class="stat-icon">🟢</span><div class="stat-value">'+online+'</div><div class="stat-label">Онлайн</div></div>'+
+            '<div class="stat-card cyan"><span class="stat-icon">💬</span><div class="stat-value">'+allMessages.length+'</div><div class="stat-label">Сообщений</div></div>'+
+            '<div class="stat-card gold"><span class="stat-icon">📢</span><div class="stat-value">'+channels+'</div><div class="stat-label">Каналов</div></div>'+
+            '<div class="stat-card purple"><span class="stat-icon">👥</span><div class="stat-value">'+groups+'</div><div class="stat-label">Групп</div></div>'+
+            '<div class="stat-card cyan"><span class="stat-icon">🎁</span><div class="stat-value">'+allNfts.length+'</div><div class="stat-label">NFT</div></div>';
+    }
+
+    /* ===================== TABS ===================== */
+    function switchTab(tab){document.querySelectorAll('.admin-tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-tab')===tab)});document.querySelectorAll('.tab-content').forEach(function(c){c.classList.toggle('active',c.id==='tab-'+tab)});updateIndicator();if(tab==='users')renderUsers();if(tab==='channels')renderChannels();if(tab==='nfts')renderNfts();if(tab==='rewards')renderRewardLog();if(tab==='tools')renderTools()}
+    function updateIndicator(){var a=document.querySelector('.admin-tab.active');var ind=document.getElementById('tabIndicator');if(!a||!ind)return;var c=document.getElementById('adminTabs').getBoundingClientRect();var r=a.getBoundingClientRect();ind.style.left=(r.left-c.left)+'px';ind.style.width=r.width+'px'}
+
+    /* ===================== USERS ===================== */
+    function renderUsers(){
+        var filter=(document.getElementById('userSearch').value||'').toLowerCase();
+        var list=document.getElementById('userList');
+        var filtered=allUsers.filter(function(u){if(!filter)return true;return u.name.toLowerCase().indexOf(filter)!==-1||(u.username&&u.username.toLowerCase().indexOf(filter)!==-1)});
+        if(!filtered.length){list.innerHTML='<div class="empty-state"><span class="empty-icon">👤</span><div class="empty-title">Не найдено</div></div>';return}
+        list.innerHTML='';
+        filtered.forEach(function(u){
+            var div=document.createElement('div');div.className='user-row';
+            var avCls='ur-avatar'+(u.melioPlus?' plus-ring':'');
+            var avInner=u.avatar?'<img src="'+u.avatar+'" alt="">':getInitials(u.name);
+            var verHTML=u.verified?'<img src="https://cdn3d.iconscout.com/3d/premium/thumb/tick-3d-icon-png-download-10199917.png" class="verified-badge" alt="✓">':'';
+            var plusHTML=u.melioPlus?'<span class="plus-badge">PLUS</span>':'';
+            var roleMap={user:'role-user',admin:'role-admin',superadmin:'role-superadmin'};
+            var roleText={user:'User',admin:'Admin',superadmin:'SuperAdmin'};
+            div.innerHTML='<div class="'+avCls+'">'+avInner+'<span class="ur-online '+(u.online?'on':'off')+'"></span></div>'+
+                '<div class="ur-info"><div class="ur-name">'+u.name+' '+verHTML+' '+plusHTML+'</div><div class="ur-sub">'+(u.username?'@'+u.username:'ID: '+u.id.slice(0,12))+'</div></div>'+
+                '<div class="ur-badges"><span class="ur-role-badge '+(roleMap[u.role]||'role-user')+'">'+(roleText[u.role]||'User')+'</span><span class="ur-crystals">💎 '+(u.crystals||0).toLocaleString()+'</span></div>';
+            div.addEventListener('click',function(){openUserActions(u.id)});
+            list.appendChild(div);
+        });
+    }
+
+    /* ===================== USER ACTIONS ===================== */
+    function openUserActions(userId){
+        selectedUserId=userId;
+        var u=findUser(userId);if(!u)return;
+        document.getElementById('uaName').textContent=u.name;
+        var isSuperadmin=currentUser.role==='superadmin';
+        var html='<div class="action-row" style="flex-direction:column;gap:8px">';
+        html+='<button class="act-btn" onclick="openCrystalsForUser()" style="width:100%;justify-content:center;padding:12px">💎 Кристаллы ('+u.crystals+')</button>';
+        html+='<button class="act-btn" onclick="toggleVerified()" style="width:100%;justify-content:center;padding:12px">'+(u.verified?'❌ Убрать верификацию':'✅ Верифицировать')+'</button>';
+        html+='<button class="act-btn" onclick="togglePlus()" style="width:100%;justify-content:center;padding:12px">'+(u.melioPlus?'⬇️ Убрать Melio+':'⬆️ Выдать Melio+')+'</button>';
+        if(isSuperadmin){
+            html+='<button class="act-btn" onclick="cycleRole()" style="width:100%;justify-content:center;padding:12px">🛡️ Роль: '+u.role+'</button>';
+        }
+        html+='<button class="act-btn" onclick="openRewardForUser()" style="width:100%;justify-content:center;padding:12px">🏆 Выдать награду</button>';
+        html+='<button class="act-btn" onclick="openAchForUser()" style="width:100%;justify-content:center;padding:12px">⭐ Выдать достижение</button>';
+        if(isSuperadmin&&u.id!==currentUser.id){
+            html+='<button class="act-btn danger" onclick="deleteUser()" style="width:100%;justify-content:center;padding:12px">🗑 Удалить пользователя</button>';
+        }
+        html+='</div>';
+        document.getElementById('uaContent').innerHTML=html;
+        openModal('userActionsModal');
+    }
+
+    function openCrystalsForUser(){closeModal('userActionsModal');var u=findUser(selectedUserId);document.getElementById('crystalsUserName').textContent=u?u.name+' (💎 '+u.crystals+')':'—';document.getElementById('crystalsAmount').value='';openModal('crystalsModal')}
+    function saveCrystals(){var amount=parseInt(document.getElementById('crystalsAmount').value);if(isNaN(amount)||amount===0){showToast('Введите число','error');return}var users=JSON.parse(localStorage.getItem('melio_users')||'[]');for(var i=0;i<users.length;i++){if(users[i].id===selectedUserId){users[i].crystals=(users[i].crystals||0)+amount;break}}localStorage.setItem('melio_users',JSON.stringify(users));
+        var tx=JSON.parse(localStorage.getItem('melio_crystal_transactions')||'[]');tx.push({id:'tx_'+Date.now(),userId:selectedUserId,amount:amount,type:amount>0?'add':'subtract',fromUserId:currentUser.id,toUserId:selectedUserId,createdAt:new Date().toISOString()});localStorage.setItem('melio_crystal_transactions',JSON.stringify(tx));
+        refreshData();closeModal('crystalsModal');showToast((amount>0?'+':'')+amount+' 💎','success');renderAll()}
+
+    function toggleVerified(){var users=JSON.parse(localStorage.getItem('melio_users')||'[]');for(var i=0;i<users.length;i++){if(users[i].id===selectedUserId){users[i].verified=!users[i].verified;showToast(users[i].verified?'Верифицирован ✅':'Верификация убрана','info');break}}localStorage.setItem('melio_users',JSON.stringify(users));refreshData();closeModal('userActionsModal');renderAll()}
+    function togglePlus(){var users=JSON.parse(localStorage.getItem('melio_users')||'[]');for(var i=0;i<users.length;i++){if(users[i].id===selectedUserId){users[i].melioPlus=!users[i].melioPlus;showToast(users[i].melioPlus?'Melio+ выдан ⬆️':'Melio+ убран','info');break}}localStorage.setItem('melio_users',JSON.stringify(users));refreshData();closeModal('userActionsModal');renderAll()}
+    function cycleRole(){var roles=['user','admin','superadmin'];var users=JSON.parse(localStorage.getItem('melio_users')||'[]');for(var i=0;i<users.length;i++){if(users[i].id===selectedUserId){var ci=roles.indexOf(users[i].role);users[i].role=roles[(ci+1)%roles.length];showToast('Роль: '+users[i].role,'info');break}}localStorage.setItem('melio_users',JSON.stringify(users));refreshData();closeModal('userActionsModal');renderAll()}
+    function deleteUser(){if(!confirm('Удалить пользователя?'))return;var users=JSON.parse(localStorage.getItem('melio_users')||'[]');users=users.filter(function(u){return u.id!==selectedUserId});localStorage.setItem('melio_users',JSON.stringify(users));refreshData();closeModal('userActionsModal');showToast('Пользователь удалён','error');renderAll()}
+
+    function openRewardForUser(){closeModal('userActionsModal');document.getElementById('rewardUser').innerHTML='';var u=findUser(selectedUserId);if(u){var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.name;document.getElementById('rewardUser').appendChild(opt)}document.getElementById('rewardTitle').value='';document.getElementById('rewardDesc').value='';openModal('rewardModal')}
+    function openAchForUser(){closeModal('userActionsModal');document.getElementById('achUser').innerHTML='';var u=findUser(selectedUserId);if(u){var opt=document.createElement('option');opt.value=u.id;opt.textContent=u.name;document.getElementById('achUser').appendChild(opt)}document.getElementById('achText').value='';document.getElementById('achLevel').value='1';openModal('achievementModal')}
+
+    /* ===================== REWARDS ===================== */
+    function openGiveRewardModal(){fillUserSelect('rewardUser');document.getElementById('rewardTitle').value='';document.getElementById('rewardDesc').value='';openModal('rewardModal')}
+    function saveReward(){var uid=document.getElementById('rewardUser').value;var title=document.getElementById('rewardTitle').value.trim();var desc=document.getElementById('rewardDesc').value.trim();if(!title){showToast('Введите название','error');return}var users=JSON.parse(localStorage.getItem('melio_users')||'[]');for(var i=0;i<users.length;i++){if(users[i].id===uid){if(!users[i].rewards)users[i].rewards=[];users[i].rewards.push({id:'rw_'+Date.now(),title:title,description:desc,grantedBy:currentUser.id,grantedAt:new Date().toISOString()});break}}localStorage.setItem('melio_users',JSON.stringify(users));refreshData();closeModal('rewardModal');showToast('Награда выдана! 🏆','success');renderAll()}
+
+    function openGiveAchievementModal(){fillUserSelect('achUser');document.getElementById('achText').value='';document.getElementById('achLevel').value='1';openModal('achievementModal')}
+    function saveAchievement(){var uid=document.getElementById('achUser').value;var text=document.getElementById('achText').value.trim();var level=parseInt(document.getElementById('achLevel').value)||1;if(!text){showToast('Введите текст','error');return}var users=JSON.parse(localStorage.getItem('melio_users')||'[]');for(var i=0;i<users.length;i++){if(users[i].id===uid){if(!users[i].achievements)users[i].achievements=[];users[i].achievements.push({id:'ach_'+Date.now(),text:text,level:Math.min(10,Math.max(1,level)),grantedBy:currentUser.id,grantedAt:new Date().toISOString()});break}}localStorage.setItem('melio_users',JSON.stringify(users));refreshData();closeModal('achievementModal');showToast('Достижение выдано! ⭐','success');renderAll()}
+
+    function renderRewardLog(){var html='';allUsers.forEach(function(u){var rewards=u.rewards||[];var achs=u.achievements||[];rewards.forEach(function(r){html+='<div class="nft-row"><div class="nft-icon-wrap epic">🏆</div><div class="nft-info"><div class="nft-name">'+r.title+'</div><div class="nft-sub">→ '+u.name+'</div></div></div>'});achs.forEach(function(a){html+='<div class="nft-row"><div class="nft-icon-wrap rare">⭐</div><div class="nft-info"><div class="nft-name">'+a.text+' (Lv.'+a.level+')</div><div class="nft-sub">→ '+u.name+'</div></div></div>'})});
+    document.getElementById('rewardLog').innerHTML=html||'<div class="empty-state"><span class="empty-icon">🏆</span><div class="empty-title">Нет наград</div></div>'}
+
+    /* ===================== CHANNELS ===================== */
+    function renderChannels(){var channels=allChats.filter(function(c){return c.type==='channel'||c.type==='group'});var container=document.getElementById('channelList');if(!channels.length){container.innerHTML='<div class="empty-state"><span class="empty-icon">📢</span><div class="empty-title">Нет каналов</div></div>';return}
+    var html='';channels.forEach(function(ch){var owner=findUser(ch.ownerId);var avInner=ch.avatar?'<img src="'+ch.avatar+'" alt="">':(ch.type==='channel'?'📢':'👥');html+='<div class="channel-row"><div class="ch-avatar">'+avInner+'</div><div class="ch-info"><div class="ch-name">'+ch.name+' <span style="font-size:11px;color:var(--text-muted)">'+(ch.type==='channel'?'канал':'группа')+'</span></div><div class="ch-sub">'+(ch.channelUsername?'@'+ch.channelUsername+' · ':'')+ch.members.length+' участников'+(owner?' · 👤 '+owner.name:'')+'</div></div></div>'});
+    container.innerHTML=html}
+
+    function openCreateChannelModal(){document.getElementById('chName').value='';document.getElementById('chUsername').value='';openModal('createChannelModal')}
+    function saveChannel(){var name=document.getElementById('chName').value.trim();var username=document.getElementById('chUsername').value.trim().replace(/^@/,'');if(!name){showToast('Введите название','error');return}var chats=JSON.parse(localStorage.getItem('melio_chats')||'[]');var ch={id:'chat_'+Date.now().toString(36)+Math.random().toString(36).substr(2,5),type:'channel',name:name,channelUsername:username||null,ownerId:currentUser.id,members:allUsers.map(function(u){return u.id}),lastMessage:null,createdAt:new Date().toISOString(),avatar:null};chats.push(ch);localStorage.setItem('melio_chats',JSON.stringify(chats));refreshData();closeModal('createChannelModal');showToast('Канал создан! 📢','success');renderAll()}
+
+    /* ===================== NFTS ===================== */
+    function renderNfts(){var container=document.getElementById('nftList');if(!allNfts.length){container.innerHTML='<div class="empty-state"><span class="empty-icon">🎁</span><div class="empty-title">Нет NFT</div></div>';return}
+    var html='';allNfts.forEach(function(nft){var owner=findUser(nft.ownerId);var icon=rarityIcons[nft.rarity]||'🎁';html+='<div class="nft-row"><div class="nft-icon-wrap '+(nft.rarity||'common')+'">'+icon+'</div><div class="nft-info"><div class="nft-name">'+nft.name+'</div><div class="nft-sub">'+(owner?'👤 '+owner.name:'Без владельца')+' · #'+nft.id.slice(-4)+'</div></div><span class="nft-rarity-badge rarity-'+(nft.rarity||'common')+'">'+(rarityNames[nft.rarity]||'Обычный')+'</span></div>'});
+    container.innerHTML=html}
+
+    function openCreateNftModal(){document.getElementById('nftNameInput').value='';document.getElementById('nftDescInput').value='';document.getElementById('nftRarityInput').value='common';openModal('createNftModal')}
+    function saveNft(){var name=document.getElementById('nftNameInput').value.trim();var desc=document.getElementById('nftDescInput').value.trim();var rarity=document.getElementById('nftRarityInput').value;if(!name){showToast('Введите название','error');return}var nfts=JSON.parse(localStorage.getItem('melio_nfts')||'[]');var nft={id:'nft_'+Date.now().toString(36)+Math.random().toString(36).substr(2,5),name:name,rarity:rarity,image:'',description:desc||'',ownerId:null,createdBy:currentUser.id,createdAt:new Date().toISOString()};nfts.push(nft);localStorage.setItem('melio_nfts',JSON.stringify(nfts));refreshData();closeModal('createNftModal');showToast('NFT создан! 🎁','success');renderAll()}
+
+    function openGiveNftModal(){
+        var sel=document.getElementById('giveNftSelect');sel.innerHTML='';
+        allNfts.forEach(function(n){var opt=document.createElement('option');opt.value=n.id;var owner=findUser(n.ownerId);opt.textContent=(rarityIcons[n.rarity]||'🎁')+' '+n.name+(owner?' (у '+owner.name+')':' (без владельца)');sel.appendChild(opt)});
+        fillUserSelect('giveNftUser');
+        openModal('giveNftModal');
+    }
+
+    function saveGiveNft(){
+        var nftId=document.getElementById('giveNftSelect').value;
+        var userId=document.getElementById('giveNftUser').value;
+        if(!nftId||!userId){showToast('Выберите NFT и пользователя','error');return}
+
+        var users=JSON.parse(localStorage.getItem('melio_users')||'[]');
+        var nfts=JSON.parse(localStorage.getItem('melio_nfts')||'[]');
+
+        // Remove from previous owner
+        users.forEach(function(u){if(u.nftGifts){var idx=u.nftGifts.indexOf(nftId);if(idx!==-1)u.nftGifts.splice(idx,1)}});
+
+        // Add to new owner
+        for(var i=0;i<users.length;i++){if(users[i].id===userId){if(!users[i].nftGifts)users[i].nftGifts=[];users[i].nftGifts.push(nftId);break}}
+
+        // Update nft
+        for(var j=0;j<nfts.length;j++){if(nfts[j].id===nftId){nfts[j].ownerId=userId;break}}
+
+        localStorage.setItem('melio_users',JSON.stringify(users));
+        localStorage.setItem('melio_nfts',JSON.stringify(nfts));
+        refreshData();closeModal('giveNftModal');
+
+        var nft=allNfts.find(function(n){return n.id===nftId});
+        var user=findUser(userId);
+        showToast('NFT «'+(nft?nft.name:'')+'» выдан '+(user?user.name:'')+'! 🎁','success');
+        renderAll();
+    }
+
+    /* ===================== TOOLS ===================== */
+    function renderTools(){
+        document.getElementById('toolsList').innerHTML=
+            '<button class="act-btn" onclick="broadcastMessage()" style="padding:14px;justify-content:center;font-size:14px">📢 Отправить сообщение в Melio News</button>'+
+            '<button class="act-btn" onclick="resetAllOnline()" style="padding:14px;justify-content:center;font-size:14px">🔴 Сбросить все онлайн-статусы</button>'+
+            '<button class="act-btn" onclick="recalcChats()" style="padding:14px;justify-content:center;font-size:14px">🔄 Пересчитать lastMessage в чатах</button>'+
+            '<button class="act-btn danger" onclick="clearAllMessages()" style="padding:14px;justify-content:center;font-size:14px">🗑 Удалить все сообщения</button>'+
+            '<button class="act-btn danger" onclick="fullReset()" style="padding:14px;justify-content:center;font-size:14px">💀 Полный сброс данных</button>';
+    }
+
+    function broadcastMessage(){var text=prompt('Текст сообщения для Melio News:');if(!text)return;var msgs=JSON.parse(localStorage.getItem('melio_messages')||'[]');var msg={id:'msg_'+Date.now().toString(36)+Math.random().toString(36).substr(2,5),chatId:'chat_melio_news',senderId:currentUser.id,text:text,status:'sent',createdAt:new Date().toISOString(),deleted:false};msgs.push(msg);localStorage.setItem('melio_messages',JSON.stringify(msgs));
+    var chats=JSON.parse(localStorage.getItem('melio_chats')||'[]');for(var i=0;i<chats.length;i++){if(chats[i].id==='chat_melio_news'){chats[i].lastMessage=msg;break}}localStorage.setItem('melio_chats',JSON.stringify(chats));refreshData();showToast('Сообщение отправлено в Melio News! 📢','success')}
+
+    function resetAllOnline(){var users=JSON.parse(localStorage.getItem('melio_users')||'[]');users.forEach(function(u){u.online=false});localStorage.setItem('melio_users',JSON.stringify(users));refreshData();showToast('Все статусы сброшены','info');renderAll()}
+
+    function recalcChats(){var chats=JSON.parse(localStorage.getItem('melio_chats')||'[]');var msgs=JSON.parse(localStorage.getItem('melio_messages')||'[]');chats.forEach(function(c){var chatMsgs=msgs.filter(function(m){return m.chatId===c.id&&!m.deleted});if(chatMsgs.length){chatMsgs.sort(function(a,b){return new Date(b.createdAt)-new Date(a.createdAt)});c.lastMessage=chatMsgs[0]}else{c.lastMessage=null}});localStorage.setItem('melio_chats',JSON.stringify(chats));refreshData();showToast('Чаты пересчитаны! 🔄','success')}
+
+    function clearAllMessages(){if(!confirm('Удалить ВСЕ сообщения?'))return;localStorage.setItem('melio_messages',JSON.stringify([]));var chats=JSON.parse(localStorage.getItem('melio_chats')||'[]');chats.forEach(function(c){c.lastMessage=null});localStorage.setItem('melio_chats',JSON.stringify(chats));refreshData();showToast('Все сообщения удалены','error');renderAll()}
+
+    function fullReset(){if(!confirm('ПОЛНЫЙ СБРОС! Все данные будут удалены. Продолжить?'))return;if(!confirm('Вы уверены? Это необратимо!'))return;localStorage.clear();showToast('Данные сброшены. Перезагрузка...','error');setTimeout(function(){window.location.href='melio-auth.html'},1000)}
+
+    /* ===================== RENDER ALL ===================== */
+    function renderAll(){renderStats();renderUsers();renderChannels();renderNfts();renderRewardLog();renderTools()}
+
+    /* ===================== INIT ===================== */
+    document.addEventListener('DOMContentLoaded',function(){
+        loadTheme();createParticles();
+        var session=JSON.parse(localStorage.getItem('melio_session')||'{}');
+        if(!session.loggedIn){window.location.href='melio-auth.html';return}
+        allUsers=JSON.parse(localStorage.getItem('melio_users')||'[]');
+        currentUser=allUsers.find(function(u){return u.id===session.userId});
+        if(!currentUser||currentUser.role==='user'){showToast('Нет доступа','error');setTimeout(function(){window.location.href='melio-app.html'},500);return}
+
+        document.getElementById('roleBadge').textContent=currentUser.role==='superadmin'?'SUPERADMIN':'ADMIN';
+        refreshData();renderAll();
+        setTimeout(updateIndicator,50);
+        window.addEventListener('resize',updateIndicator);
+
+        document.querySelectorAll('.modal-overlay').forEach(function(m){m.addEventListener('click',function(e){if(e.target===m)m.classList.remove('visible')})});
+        document.addEventListener('keydown',function(e){if(e.key==='Escape')document.querySelectorAll('.modal-overlay.visible').forEach(function(m){m.classList.remove('visible')})});
+    });
+</script>
+</body>
+</html>

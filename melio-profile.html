@@ -1,0 +1,1064 @@
+<!-- melio-profile.html -->
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melio — Профиль</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a2e;
+            --bg-card: #16162a;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888a8;
+            --text-muted: #555570;
+            --accent-purple: #7c3aed;
+            --accent-purple-light: #a855f7;
+            --accent-cyan: #06b6d4;
+            --accent-cyan-light: #22d3ee;
+            --accent-gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+            --accent-glow-purple: 0 0 20px rgba(124, 58, 237, 0.4);
+            --accent-glow-cyan: 0 0 20px rgba(6, 182, 212, 0.4);
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border-color: rgba(124, 58, 237, 0.2);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 20px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f0f0f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555570;
+            --text-muted: #8888a8;
+            --border-color: rgba(124, 58, 237, 0.15);
+        }
+
+        *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+        html, body {
+            height:100%; font-family:var(--font-main);
+            background:var(--bg-primary); color:var(--text-primary);
+            overflow-x:hidden; overflow-y:auto;
+        }
+        body::-webkit-scrollbar{width:6px}
+        body::-webkit-scrollbar-track{background:transparent}
+        body::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:4px}
+        button { font-family:var(--font-main); cursor:pointer; }
+
+        /* BACKGROUND */
+        .app-bg {
+            position:fixed; top:0; left:0;
+            width:100%; height:100%;
+            z-index:0; overflow:hidden;
+        }
+        .app-bg::before {
+            content:''; position:absolute;
+            width:600px; height:600px;
+            background:radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%);
+            top:-200px; left:-200px;
+            animation:floatOrb1 15s ease-in-out infinite;
+        }
+        .app-bg::after {
+            content:''; position:absolute;
+            width:500px; height:500px;
+            background:radial-gradient(circle, rgba(6,182,212,0.12) 0%, transparent 70%);
+            bottom:-200px; right:-200px;
+            animation:floatOrb2 18s ease-in-out infinite;
+        }
+        @keyframes floatOrb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(100px,50px) scale(1.1)}66%{transform:translate(50px,100px) scale(0.9)}}
+        @keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-80px,-60px) scale(1.15)}66%{transform:translate(-40px,-80px) scale(0.95)}}
+        .grid-overlay {
+            position:fixed; top:0; left:0; width:100%; height:100%;
+            background-image:linear-gradient(rgba(124,58,237,0.03) 1px, transparent 1px),linear-gradient(90deg, rgba(124,58,237,0.03) 1px, transparent 1px);
+            background-size:60px 60px; z-index:0; pointer-events:none;
+        }
+        .particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:particleFloat linear infinite}
+        @keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
+
+        /* TOASTS */
+        .toast-container{position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:10px}
+        .toast{padding:14px 20px;border-radius:var(--border-radius-sm);color:#fff;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,0.4);animation:toastIn 0.4s cubic-bezier(0.16,1,0.3,1);display:flex;align-items:center;gap:10px;max-width:360px;backdrop-filter:blur(10px)}
+        .toast.success{background:linear-gradient(135deg,rgba(34,197,94,0.9),rgba(22,163,74,0.9));border:1px solid rgba(34,197,94,0.3)}
+        .toast.error{background:linear-gradient(135deg,rgba(239,68,68,0.9),rgba(220,38,38,0.9));border:1px solid rgba(239,68,68,0.3)}
+        .toast.info{background:linear-gradient(135deg,rgba(124,58,237,0.9),rgba(6,182,212,0.9));border:1px solid rgba(124,58,237,0.3)}
+        .toast-exit{animation:toastOut 0.3s ease forwards}
+        @keyframes toastIn{0%{opacity:0;transform:translateX(100px) scale(0.9)}100%{opacity:1;transform:translateX(0) scale(1)}}
+        @keyframes toastOut{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(100px)}}
+
+        /* TOP BAR */
+        .top-bar {
+            position:sticky; top:0; z-index:10;
+            padding:12px 20px;
+            background:var(--bg-secondary);
+            border-bottom:1px solid var(--border-color);
+            display:flex; align-items:center; gap:12px;
+            backdrop-filter:blur(16px);
+        }
+        .back-btn {
+            width:40px; height:40px;
+            border-radius:var(--border-radius-sm);
+            background:none; border:none;
+            color:var(--text-secondary); font-size:20px;
+            display:flex; align-items:center; justify-content:center;
+            transition:all var(--transition-fast);
+        }
+        .back-btn:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+        .back-btn:active{transform:scale(0.93)}
+        .top-bar-title{font-size:17px;font-weight:700;flex:1}
+        .top-bar-action {
+            width:40px; height:40px;
+            border-radius:var(--border-radius-sm);
+            background:none; border:none;
+            color:var(--text-secondary); font-size:18px;
+            display:flex; align-items:center; justify-content:center;
+            transition:all var(--transition-fast);
+        }
+        .top-bar-action:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+
+        /* PROFILE CONTAINER */
+        .profile-container {
+            position:relative; z-index:1;
+            max-width:600px; margin:0 auto;
+            padding:0 16px 40px;
+            opacity:0;
+            animation:pageAppear 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s forwards;
+        }
+        @keyframes pageAppear{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+
+        /* BANNER */
+        .profile-banner {
+            height:160px;
+            border-radius:0 0 var(--border-radius-lg) var(--border-radius-lg);
+            position:relative; overflow:hidden;
+            margin-bottom:-50px;
+        }
+        .profile-banner-bg {
+            width:100%; height:100%;
+            object-fit:cover;
+        }
+        .profile-banner-color {
+            width:100%; height:100%;
+        }
+        .profile-banner-overlay {
+            position:absolute; top:0; left:0; width:100%; height:100%;
+            background:linear-gradient(transparent 40%, rgba(0,0,0,0.4) 100%);
+        }
+        .banner-edit-btn {
+            position:absolute; bottom:10px; right:10px;
+            padding:6px 14px; border-radius:var(--border-radius-sm);
+            background:rgba(0,0,0,0.5); border:1px solid rgba(255,255,255,0.2);
+            color:#fff; font-size:12px; font-weight:600;
+            font-family:var(--font-main);
+            display:flex; align-items:center; gap:6px;
+            cursor:pointer; transition:all var(--transition-fast);
+            backdrop-filter:blur(8px);
+        }
+        .banner-edit-btn:hover{background:rgba(0,0,0,0.7);border-color:var(--accent-purple)}
+
+        /* AVATAR */
+        .profile-avatar-section {
+            display:flex; justify-content:center;
+            position:relative; z-index:2;
+            margin-bottom:16px;
+        }
+        .profile-avatar-wrap {
+            position:relative;
+        }
+        .profile-avatar {
+            width:100px; height:100px; border-radius:50%;
+            background:var(--accent-gradient);
+            display:flex; align-items:center; justify-content:center;
+            font-size:40px; font-weight:800; color:#fff;
+            border:5px solid var(--bg-primary);
+            overflow:hidden; position:relative;
+            box-shadow:0 8px 30px rgba(0,0,0,0.3);
+        }
+        .profile-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .profile-avatar.plus-ring {
+            box-shadow:0 0 0 3px var(--bg-primary),0 0 0 6px var(--accent-purple),0 8px 30px rgba(0,0,0,0.3);
+        }
+        .avatar-edit-overlay {
+            display:none; position:absolute; top:0; left:0;
+            width:100%; height:100%; border-radius:50%;
+            background:rgba(0,0,0,0.5);
+            align-items:center; justify-content:center;
+            cursor:pointer; font-size:28px;
+            transition:all var(--transition-fast);
+        }
+        .profile-avatar-wrap:hover .avatar-edit-overlay.editable{display:flex}
+
+        .profile-online-dot {
+            position:absolute; bottom:6px; right:6px;
+            width:18px; height:18px; border-radius:50%;
+            border:3px solid var(--bg-primary);
+            z-index:3;
+        }
+        .profile-online-dot.on{background:var(--success)}
+        .profile-online-dot.off{background:var(--text-muted)}
+
+        /* PROFILE ANIMATIONS */
+        .anim-fade-scale {
+            animation:animFadeScale 0.6s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes animFadeScale{0%{opacity:0;transform:scale(0.8)}100%{opacity:1;transform:scale(1)}}
+
+        .anim-slide-in {
+            animation:animSlideIn 0.6s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes animSlideIn{0%{opacity:0;transform:translateX(-30px)}100%{opacity:1;transform:translateX(0)}}
+
+        .anim-rotate-pop {
+            animation:animRotatePop 0.7s cubic-bezier(0.16,1,0.3,1);
+        }
+        @keyframes animRotatePop{0%{opacity:0;transform:rotate(-15deg) scale(0.7)}50%{transform:rotate(3deg) scale(1.05)}100%{opacity:1;transform:rotate(0) scale(1)}}
+
+        /* INFO SECTION */
+        .profile-info {
+            text-align:center; margin-bottom:24px;
+        }
+        .profile-name {
+            font-size:26px; font-weight:800;
+            display:flex; align-items:center; justify-content:center;
+            gap:8px; flex-wrap:wrap;
+            margin-bottom:4px;
+        }
+        .profile-username {
+            font-size:14px; color:var(--text-muted);
+            margin-bottom:6px;
+        }
+        .profile-role-badge {
+            display:inline-flex; align-items:center; gap:4px;
+            padding:4px 12px; border-radius:20px;
+            font-size:12px; font-weight:600;
+            margin-bottom:4px;
+        }
+        .role-user{background:var(--bg-tertiary);color:var(--text-secondary)}
+        .role-admin{background:rgba(124,58,237,0.15);color:var(--accent-purple-light);border:1px solid rgba(124,58,237,0.2)}
+        .role-superadmin{background:rgba(234,179,8,0.12);color:var(--warning);border:1px solid rgba(234,179,8,0.2)}
+
+        .profile-bio {
+            font-size:14px; color:var(--text-secondary);
+            margin-top:8px; line-height:1.5;
+            max-width:400px; margin-left:auto; margin-right:auto;
+        }
+
+        .verified-badge{width:20px;height:20px;flex-shrink:0}
+        .plus-badge{font-size:10px;padding:2px 8px;background:var(--accent-gradient);border-radius:10px;color:#fff;font-weight:700;letter-spacing:0.3px;flex-shrink:0;box-shadow:var(--accent-glow-purple)}
+
+        /* STATS ROW */
+        .stats-row {
+            display:flex; gap:8px; margin-bottom:24px;
+        }
+        .stat-card {
+            flex:1; padding:16px 12px;
+            background:var(--bg-card);
+            border:1px solid var(--border-color);
+            border-radius:var(--border-radius);
+            text-align:center;
+            transition:all var(--transition-fast);
+            box-shadow:0 4px 16px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .stat-card:hover{border-color:var(--accent-purple);transform:translateY(-2px)}
+        .stat-value {
+            font-size:22px; font-weight:800;
+            background:var(--accent-gradient);
+            -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+            background-clip:text;
+            margin-bottom:2px;
+        }
+        .stat-label {
+            font-size:11px; color:var(--text-muted);
+            text-transform:uppercase; letter-spacing:0.5px;
+            font-weight:600;
+        }
+
+        /* ACTION BUTTONS */
+        .profile-actions {
+            display:flex; gap:10px; margin-bottom:24px;
+        }
+        .action-btn {
+            flex:1; padding:13px;
+            border-radius:var(--border-radius-sm);
+            border:1px solid var(--border-color);
+            background:var(--bg-card);
+            color:var(--text-primary); font-size:14px;
+            font-weight:600; font-family:var(--font-main);
+            display:flex; align-items:center; justify-content:center;
+            gap:8px; cursor:pointer;
+            transition:all var(--transition-fast);
+        }
+        .action-btn:hover{border-color:var(--accent-purple);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.2)}
+        .action-btn:active{transform:translateY(0)}
+        .action-btn.primary{background:var(--accent-gradient);border:none;color:#fff}
+        .action-btn.primary:hover{box-shadow:var(--accent-glow-purple),0 6px 20px rgba(0,0,0,0.3)}
+        .action-btn.danger{color:var(--danger);border-color:rgba(239,68,68,0.2)}
+        .action-btn.danger:hover{background:rgba(239,68,68,0.08);border-color:var(--danger)}
+
+        /* SECTIONS */
+        .section {
+            margin-bottom:20px;
+        }
+        .section-header {
+            display:flex; align-items:center; justify-content:space-between;
+            margin-bottom:12px; padding:0 4px;
+        }
+        .section-title {
+            font-size:14px; font-weight:700;
+            text-transform:uppercase; letter-spacing:1px;
+            color:var(--text-secondary);
+            display:flex; align-items:center; gap:8px;
+        }
+        .section-count {
+            font-size:11px; padding:2px 8px;
+            background:var(--bg-tertiary);
+            border-radius:10px; color:var(--text-muted);
+            font-weight:600;
+        }
+
+        /* REWARD CARD */
+        .reward-card {
+            background:var(--bg-card);
+            border:1px solid var(--border-color);
+            border-radius:var(--border-radius);
+            padding:14px 16px;
+            margin-bottom:8px;
+            display:flex; align-items:center; gap:12px;
+            transition:all var(--transition-fast);
+            box-shadow:0 4px 12px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .reward-card:hover{border-color:var(--accent-purple);transform:translateY(-1px)}
+        .reward-icon {
+            width:42px; height:42px; border-radius:var(--border-radius-sm);
+            background:var(--accent-gradient);
+            display:flex; align-items:center; justify-content:center;
+            font-size:20px; flex-shrink:0;
+        }
+        .reward-info{flex:1;min-width:0}
+        .reward-title{font-size:14px;font-weight:700;margin-bottom:2px}
+        .reward-desc{font-size:12px;color:var(--text-muted)}
+        .reward-date{font-size:11px;color:var(--text-muted);flex-shrink:0}
+
+        /* ACHIEVEMENT CARD */
+        .achievement-card {
+            background:var(--bg-card);
+            border:1px solid var(--border-color);
+            border-radius:var(--border-radius);
+            padding:14px 16px;
+            margin-bottom:8px;
+            display:flex; align-items:center; gap:12px;
+            transition:all var(--transition-fast);
+            box-shadow:0 4px 12px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .achievement-card:hover{border-color:var(--accent-cyan);transform:translateY(-1px)}
+        .achievement-level {
+            width:42px; height:42px; border-radius:50%;
+            background:linear-gradient(135deg,var(--accent-cyan),var(--accent-purple));
+            display:flex; align-items:center; justify-content:center;
+            font-size:16px; font-weight:800; color:#fff;
+            flex-shrink:0;
+            box-shadow:0 0 12px rgba(6,182,212,0.3);
+        }
+        .achievement-info{flex:1;min-width:0}
+        .achievement-text{font-size:14px;font-weight:600}
+        .achievement-date{font-size:11px;color:var(--text-muted);margin-top:2px}
+
+        /* NFT GRID */
+        .nft-grid {
+            display:grid;
+            grid-template-columns:repeat(auto-fill, minmax(140px, 1fr));
+            gap:10px;
+        }
+        .nft-card {
+            background:var(--bg-card);
+            border:1px solid var(--border-color);
+            border-radius:var(--border-radius);
+            padding:14px;
+            text-align:center;
+            transition:all var(--transition-fast);
+            box-shadow:0 4px 12px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.05);
+        }
+        .nft-card:hover{border-color:var(--accent-purple);transform:translateY(-2px)}
+        .nft-icon{font-size:36px;margin-bottom:8px;display:block}
+        .nft-name{font-size:13px;font-weight:700;margin-bottom:4px}
+        .nft-rarity{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 8px;border-radius:8px;display:inline-block}
+        .rarity-common{background:rgba(136,136,168,0.15);color:var(--text-secondary)}
+        .rarity-rare{background:rgba(6,182,212,0.15);color:var(--accent-cyan-light)}
+        .rarity-epic{background:rgba(168,85,247,0.15);color:var(--accent-purple-light)}
+        .rarity-legendary{background:rgba(234,179,8,0.15);color:var(--warning)}
+
+        /* EMPTY STATE */
+        .empty-section {
+            text-align:center; padding:24px 16px;
+            color:var(--text-muted); font-size:13px;
+        }
+        .empty-section .empty-icon{font-size:28px;display:block;margin-bottom:6px}
+
+        /* EDIT PROFILE MODAL */
+        .modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center}
+        .modal-overlay.visible{display:flex}
+        .modal-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-lg);padding:32px;width:90%;max-width:480px;box-shadow:0 25px 60px rgba(0,0,0,0.5),0 0 40px rgba(124,58,237,0.08);animation:cardAppear 0.5s cubic-bezier(0.16,1,0.3,1);max-height:90vh;overflow-y:auto}
+        @keyframes cardAppear{0%{opacity:0;transform:translateY(30px) scale(0.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+        .modal-title{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+        .modal-close{width:32px;height:32px;border-radius:var(--border-radius-sm);background:var(--bg-primary);border:1px solid var(--border-color);color:var(--text-muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast)}
+        .modal-close:hover{border-color:var(--danger);color:var(--danger);transform:translateY(-2px)}
+
+        .edit-form-group{margin-bottom:16px}
+        .edit-form-group label{display:block;font-size:12px;font-weight:600;color:var(--text-secondary);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+        .edit-form-group input,
+        .edit-form-group textarea,
+        .edit-form-group select {
+            width:100%; padding:12px 16px;
+            background:var(--bg-primary);
+            border:1px solid var(--border-color);
+            border-radius:var(--border-radius-sm);
+            color:var(--text-primary); font-size:14px;
+            font-family:var(--font-main); outline:none;
+            transition:all var(--transition-fast);
+        }
+        .edit-form-group textarea{resize:vertical;min-height:60px;max-height:120px}
+        .edit-form-group select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%238888a8' d='M6 8L1 3h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 14px center}
+        .edit-form-group select option{background:var(--bg-card);color:var(--text-primary)}
+        .edit-form-group input:focus,
+        .edit-form-group textarea:focus,
+        .edit-form-group select:focus{border-color:var(--accent-purple);box-shadow:0 0 0 3px rgba(124,58,237,0.15)}
+
+        .edit-avatar-row {
+            display:flex; align-items:center; gap:16px;
+            margin-bottom:20px;
+        }
+        .edit-avatar-preview {
+            width:64px; height:64px; border-radius:50%;
+            background:var(--accent-gradient);
+            display:flex; align-items:center; justify-content:center;
+            font-size:26px; font-weight:800; color:#fff;
+            flex-shrink:0; overflow:hidden;
+        }
+        .edit-avatar-preview img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .edit-avatar-btns{display:flex;flex-direction:column;gap:6px}
+        .edit-avatar-btn{padding:8px 16px;border-radius:var(--border-radius-sm);border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);font-size:13px;font-family:var(--font-main);cursor:pointer;transition:all var(--transition-fast)}
+        .edit-avatar-btn:hover{border-color:var(--accent-purple)}
+
+        .save-btn {
+            width:100%; padding:14px;
+            background:var(--accent-gradient);
+            border:none; border-radius:var(--border-radius-sm);
+            color:#fff; font-size:15px; font-weight:700;
+            font-family:var(--font-main); cursor:pointer;
+            transition:all var(--transition-fast);
+            margin-top:8px;
+        }
+        .save-btn:hover{transform:translateY(-2px);box-shadow:var(--accent-glow-purple)}
+        .save-btn:active{transform:translateY(0)}
+
+        /* COLOR PICKER ROW */
+        .color-picker-row {
+            display:flex; gap:8px; flex-wrap:wrap;
+        }
+        .color-swatch {
+            width:36px; height:36px; border-radius:50%;
+            border:2px solid transparent; cursor:pointer;
+            transition:all var(--transition-fast);
+        }
+        .color-swatch:hover{transform:scale(1.15)}
+        .color-swatch.active{border-color:#fff;box-shadow:0 0 12px rgba(255,255,255,0.3)}
+
+        /* MEMBER SINCE */
+        .member-since {
+            text-align:center; padding:16px;
+            font-size:12px; color:var(--text-muted);
+            letter-spacing:0.5px;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 480px) {
+            .profile-banner{height:120px}
+            .profile-avatar{width:80px;height:80px;font-size:32px}
+            .profile-name{font-size:22px}
+            .stats-row{flex-wrap:wrap}
+            .stat-card{min-width:calc(50% - 4px)}
+            .profile-actions{flex-wrap:wrap}
+            .action-btn{min-width:calc(50% - 5px)}
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-bg"></div>
+<div class="grid-overlay"></div>
+<div class="toast-container" id="toastContainer"></div>
+<input type="file" id="avatarFileInput" accept="image/*" style="display:none" onchange="handleAvatarUpload(event)">
+<input type="file" id="bannerFileInput" accept="image/*" style="display:none" onchange="handleBannerUpload(event)">
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div class="top-bar-title" id="topBarTitle">Профиль</div>
+    <button class="top-bar-action" id="editTopBtn" style="display:none" onclick="openEditModal()" title="Редактировать">✏️</button>
+</div>
+
+<!-- PROFILE CONTENT -->
+<div class="profile-container" id="profileContainer">
+
+    <!-- Banner -->
+    <div class="profile-banner" id="profileBanner">
+        <div class="profile-banner-color" id="bannerColor" style="background:var(--accent-gradient)"></div>
+        <div class="profile-banner-overlay"></div>
+        <button class="banner-edit-btn" id="bannerEditBtn" style="display:none" onclick="document.getElementById('bannerFileInput').click()">
+            📷 Изменить обложку
+        </button>
+    </div>
+
+    <!-- Avatar -->
+    <div class="profile-avatar-section">
+        <div class="profile-avatar-wrap">
+            <div class="profile-avatar" id="profileAvatar">
+                <span id="avatarContent">?</span>
+                <div class="avatar-edit-overlay" id="avatarEditOverlay" onclick="document.getElementById('avatarFileInput').click()">
+                    📷
+                </div>
+            </div>
+            <div class="profile-online-dot" id="onlineDot"></div>
+        </div>
+    </div>
+
+    <!-- Info -->
+    <div class="profile-info" id="profileInfo">
+        <div class="profile-name" id="profileName">Загрузка...</div>
+        <div class="profile-username" id="profileUsername"></div>
+        <div id="profileRoleBadge"></div>
+        <div class="profile-bio" id="profileBio"></div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-row" id="statsRow"></div>
+
+    <!-- Actions -->
+    <div class="profile-actions" id="profileActions"></div>
+
+    <!-- Rewards -->
+    <div class="section" id="rewardsSection" style="display:none">
+        <div class="section-header">
+            <div class="section-title">🏆 Награды <span class="section-count" id="rewardsCount">0</span></div>
+        </div>
+        <div id="rewardsList"></div>
+    </div>
+
+    <!-- Achievements -->
+    <div class="section" id="achievementsSection" style="display:none">
+        <div class="section-header">
+            <div class="section-title">⭐ Достижения <span class="section-count" id="achievementsCount">0</span></div>
+        </div>
+        <div id="achievementsList"></div>
+    </div>
+
+    <!-- NFT -->
+    <div class="section" id="nftSection" style="display:none">
+        <div class="section-header">
+            <div class="section-title">🎁 NFT Подарки <span class="section-count" id="nftCount">0</span></div>
+        </div>
+        <div class="nft-grid" id="nftGrid"></div>
+    </div>
+
+    <!-- Member since -->
+    <div class="member-since" id="memberSince"></div>
+
+</div>
+
+<!-- EDIT PROFILE MODAL -->
+<div class="modal-overlay" id="editModal">
+    <div class="modal-card">
+        <div class="modal-header">
+            <div class="modal-title">✏️ Редактировать профиль</div>
+            <button class="modal-close" onclick="closeEditModal()">✕</button>
+        </div>
+
+        <div class="edit-avatar-row">
+            <div class="edit-avatar-preview" id="editAvatarPreview">?</div>
+            <div class="edit-avatar-btns">
+                <button class="edit-avatar-btn" onclick="document.getElementById('avatarFileInput').click()">📷 Загрузить фото</button>
+                <button class="edit-avatar-btn" onclick="removeAvatar()">🗑 Удалить фото</button>
+            </div>
+        </div>
+
+        <div class="edit-form-group">
+            <label>Имя</label>
+            <input type="text" id="editName" placeholder="Ваше имя">
+        </div>
+
+        <div class="edit-form-group">
+            <label>Username</label>
+            <input type="text" id="editUsername" placeholder="@username">
+        </div>
+
+        <div class="edit-form-group">
+            <label>Био</label>
+            <textarea id="editBio" placeholder="Расскажите о себе..."></textarea>
+        </div>
+
+        <div class="edit-form-group">
+            <label>Анимация профиля</label>
+            <select id="editAnimation">
+                <option value="fade-scale">Плавное появление</option>
+                <option value="slide-in">Слайд</option>
+                <option value="rotate-pop">Поворот</option>
+            </select>
+        </div>
+
+        <div class="edit-form-group">
+            <label>Цвет фона профиля</label>
+            <div class="color-picker-row" id="colorPicker"></div>
+        </div>
+
+        <button class="save-btn" onclick="saveProfile()">💾 Сохранить</button>
+    </div>
+</div>
+
+<script>
+    /* ===================== STATE ===================== */
+    var currentUser = null;
+    var viewUser = null;
+    var allUsers = [];
+    var allNfts = [];
+    var isOwnProfile = false;
+    var editAvatarData = undefined; // undefined = no change, null = remove, string = new
+
+    /* ===================== UTILS ===================== */
+    function getInitials(n){return n?n.split(' ').map(function(w){return w[0]}).join('').toUpperCase().slice(0,2):'?'}
+    function findUser(id){for(var i=0;i<allUsers.length;i++){if(allUsers[i].id===id)return allUsers[i]}return null}
+    function showToast(msg,type,dur){type=type||'info';dur=dur||3000;var c=document.getElementById('toastContainer');var t=document.createElement('div');t.className='toast '+type;var ic={success:'✅',error:'❌',info:'💎'};t.innerHTML='<span>'+(ic[type]||'💎')+'</span><span>'+msg+'</span>';c.appendChild(t);setTimeout(function(){t.classList.add('toast-exit');setTimeout(function(){t.remove()},300)},dur)}
+    function formatDate(iso){if(!iso)return '';return new Date(iso).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
+    function goBack(){window.location.href='melio-app.html'}
+    function createParticles(){var colors=['#7c3aed','#06b6d4','#a855f7','#22d3ee'];for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'vw';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=Math.random()*10+'s';var s=2+Math.random()*4;p.style.width=s+'px';p.style.height=s+'px';p.style.opacity=0.3+Math.random()*0.4;document.body.appendChild(p)}}
+    function loadTheme(){var t=localStorage.getItem('melio_theme')||'dark';document.documentElement.setAttribute('data-theme',t)}
+
+    function getUrlParam(key){var params=new URLSearchParams(window.location.search);return params.get(key)}
+
+    /* ===================== RENDER PROFILE ===================== */
+    function renderProfile() {
+        var user = viewUser;
+        if (!user) return;
+
+        // Animation class
+        var animClass = '';
+        if (user.profileAnimation === 'fade-scale') animClass = 'anim-fade-scale';
+        else if (user.profileAnimation === 'slide-in') animClass = 'anim-slide-in';
+        else if (user.profileAnimation === 'rotate-pop') animClass = 'anim-rotate-pop';
+
+        // Banner
+        var bannerEl = document.getElementById('bannerColor');
+        if (user.profileBg) {
+            if (user.profileBg.type === 'image' && user.profileBg.value) {
+                bannerEl.style.background = 'url(' + user.profileBg.value + ') center/cover';
+            } else if (user.profileBg.type === 'color' && user.profileBg.value) {
+                bannerEl.style.background = user.profileBg.value;
+            } else {
+                bannerEl.style.background = 'var(--accent-gradient)';
+            }
+        }
+        if (isOwnProfile) {
+            document.getElementById('bannerEditBtn').style.display = 'flex';
+        }
+
+        // Avatar
+        var avatarEl = document.getElementById('profileAvatar');
+        var avatarContent = document.getElementById('avatarContent');
+        avatarEl.className = 'profile-avatar ' + animClass;
+        if (user.melioPlus) avatarEl.classList.add('plus-ring');
+
+        if (user.avatar) {
+            avatarContent.innerHTML = '<img src="' + user.avatar + '" alt="">';
+        } else {
+            avatarContent.innerHTML = '';
+            avatarContent.textContent = getInitials(user.name);
+        }
+
+        if (isOwnProfile) {
+            document.getElementById('avatarEditOverlay').classList.add('editable');
+        }
+
+        // Online dot
+        var dotEl = document.getElementById('onlineDot');
+        dotEl.className = 'profile-online-dot ' + (user.online ? 'on' : 'off');
+
+        // Name
+        var nameHTML = user.name;
+        if (user.verified) nameHTML += ' <img src="https://cdn3d.iconscout.com/3d/premium/thumb/tick-3d-icon-png-download-10199917.png" class="verified-badge" alt="✓">';
+        if (user.melioPlus) nameHTML += ' <span class="plus-badge">PLUS</span>';
+        document.getElementById('profileName').innerHTML = nameHTML;
+
+        // Username
+        document.getElementById('profileUsername').textContent = user.username ? '@' + user.username : '';
+
+        // Role badge
+        var roleMap = {user:{text:'👤 Пользователь',cls:'role-user'},admin:{text:'🛡️ Администратор',cls:'role-admin'},superadmin:{text:'👑 Супер-Админ',cls:'role-superadmin'}};
+        var role = roleMap[user.role] || roleMap.user;
+        document.getElementById('profileRoleBadge').innerHTML = '<span class="profile-role-badge '+role.cls+'">'+role.text+'</span>';
+
+        // Bio
+        var bioEl = document.getElementById('profileBio');
+        bioEl.textContent = user.bio || '';
+        bioEl.style.display = user.bio ? 'block' : 'none';
+
+        // Top bar
+        document.getElementById('topBarTitle').textContent = isOwnProfile ? 'Мой профиль' : user.name;
+        if (isOwnProfile) {
+            document.getElementById('editTopBtn').style.display = 'flex';
+        }
+
+        // Stats
+        var rewards = user.rewards || [];
+        var achievements = user.achievements || [];
+        var nftIds = user.nftGifts || [];
+
+        document.getElementById('statsRow').innerHTML =
+            '<div class="stat-card"><div class="stat-value">💎 ' + (user.crystals || 0).toLocaleString() + '</div><div class="stat-label">Кристаллы</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + rewards.length + '</div><div class="stat-label">Награды</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + achievements.length + '</div><div class="stat-label">Достижения</div></div>' +
+            '<div class="stat-card"><div class="stat-value">' + nftIds.length + '</div><div class="stat-label">NFT</div></div>';
+
+        // Actions
+        var actionsHTML = '';
+        if (isOwnProfile) {
+            actionsHTML += '<button class="action-btn primary" onclick="openEditModal()">✏️ Редактировать</button>';
+            actionsHTML += '<button class="action-btn" onclick="window.location.href=\'melio-settings.html\'">⚙️ Настройки</button>';
+        } else {
+            actionsHTML += '<button class="action-btn primary" onclick="startChatWith()">💬 Написать</button>';
+            // Admin actions
+            if (currentUser.role === 'admin' || currentUser.role === 'superadmin') {
+                actionsHTML += '<button class="action-btn" onclick="giftCrystals()">💎 Кристаллы</button>';
+            }
+        }
+        document.getElementById('profileActions').innerHTML = actionsHTML;
+
+        // Rewards
+        if (rewards.length > 0) {
+            document.getElementById('rewardsSection').style.display = 'block';
+            document.getElementById('rewardsCount').textContent = rewards.length;
+            var rwHTML = '';
+            rewards.forEach(function(r) {
+                var grantedBy = findUser(r.grantedBy);
+                rwHTML += '<div class="reward-card">' +
+                    '<div class="reward-icon">🏆</div>' +
+                    '<div class="reward-info"><div class="reward-title">' + r.title + '</div><div class="reward-desc">' + (r.description || '') + '</div></div>' +
+                    '<div class="reward-date">' + (grantedBy ? 'от ' + grantedBy.name : '') + '</div>' +
+                '</div>';
+            });
+            document.getElementById('rewardsList').innerHTML = rwHTML;
+        }
+
+        // Achievements
+        if (achievements.length > 0) {
+            document.getElementById('achievementsSection').style.display = 'block';
+            document.getElementById('achievementsCount').textContent = achievements.length;
+            var acHTML = '';
+            achievements.forEach(function(a) {
+                acHTML += '<div class="achievement-card">' +
+                    '<div class="achievement-level">' + (a.level || 1) + '</div>' +
+                    '<div class="achievement-info"><div class="achievement-text">' + a.text + '</div><div class="achievement-date">' + formatDate(a.grantedAt) + '</div></div>' +
+                '</div>';
+            });
+            document.getElementById('achievementsList').innerHTML = acHTML;
+        }
+
+        // NFTs
+        if (nftIds.length > 0) {
+            document.getElementById('nftSection').style.display = 'block';
+            document.getElementById('nftCount').textContent = nftIds.length;
+            var nftHTML = '';
+            var rarityIcons = {common:'💿',rare:'💠',epic:'🔮',legendary:'👑'};
+            nftIds.forEach(function(nftId) {
+                var nft = allNfts.find(function(n){return n.id===nftId});
+                if (!nft) return;
+                var rarCls = 'rarity-' + (nft.rarity || 'common');
+                nftHTML += '<div class="nft-card">' +
+                    '<span class="nft-icon">' + (rarityIcons[nft.rarity] || '🎁') + '</span>' +
+                    '<div class="nft-name">' + nft.name + '</div>' +
+                    '<span class="nft-rarity ' + rarCls + '">' + (nft.rarity || 'common') + '</span>' +
+                '</div>';
+            });
+            document.getElementById('nftGrid').innerHTML = nftHTML;
+        }
+
+        // Member since
+        document.getElementById('memberSince').textContent = '📅 В Melio с ' + formatDate(user.createdAt);
+    }
+
+    /* ===================== START CHAT ===================== */
+    async function startChatWith() {
+        if (!viewUser || isOwnProfile) return;
+        var chats = JSON.parse(localStorage.getItem('melio_chats') || '[]');
+
+        // Check if private chat exists
+        var existing = chats.find(function(c) {
+            return c.type === 'private' && c.members.length === 2 &&
+                c.members.indexOf(currentUser.id) !== -1 &&
+                c.members.indexOf(viewUser.id) !== -1;
+        });
+
+        if (existing) {
+            localStorage.setItem('melio_active_chat', existing.id);
+        } else {
+            var newChat = {
+                id: 'chat_' + Date.now().toString(36) + Math.random().toString(36).substr(2,5),
+                type: 'private', name: null,
+                members: [currentUser.id, viewUser.id],
+                lastMessage: null,
+                createdAt: new Date().toISOString()
+            };
+            chats.push(newChat);
+            localStorage.setItem('melio_chats', JSON.stringify(chats));
+            localStorage.setItem('melio_active_chat', newChat.id);
+        }
+
+        window.location.href = 'melio-chat.html';
+    }
+
+    /* ===================== GIFT CRYSTALS ===================== */
+    function giftCrystals() {
+        if (!viewUser) return;
+        var amount = prompt('Сколько кристаллов добавить для ' + viewUser.name + '?', '100');
+        if (!amount) return;
+        amount = parseInt(amount);
+        if (isNaN(amount) || amount === 0) { showToast('Неверное количество', 'error'); return; }
+
+        var users = JSON.parse(localStorage.getItem('melio_users') || '[]');
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].id === viewUser.id) {
+                users[i].crystals = (users[i].crystals || 0) + amount;
+                viewUser = users[i];
+                break;
+            }
+        }
+        localStorage.setItem('melio_users', JSON.stringify(users));
+        showToast((amount > 0 ? '+' : '') + amount + ' 💎 для ' + viewUser.name, 'success');
+        renderProfile();
+    }
+
+    /* ===================== EDIT PROFILE ===================== */
+    var bgColors = ['#1a1a2e','#0a0618','#0f172a','#1e1b4b','#172554','#14532d','#3f0f0f','#451a03','#27272a','#0c0a09'];
+
+    function openEditModal() {
+        if (!isOwnProfile) return;
+        editAvatarData = undefined;
+
+        document.getElementById('editName').value = currentUser.name || '';
+        document.getElementById('editUsername').value = currentUser.username || '';
+        document.getElementById('editBio').value = currentUser.bio || '';
+        document.getElementById('editAnimation').value = currentUser.profileAnimation || 'fade-scale';
+
+        // Avatar preview
+        var preview = document.getElementById('editAvatarPreview');
+        if (currentUser.avatar) {
+            preview.innerHTML = '<img src="' + currentUser.avatar + '" alt="">';
+        } else {
+            preview.innerHTML = '';
+            preview.textContent = getInitials(currentUser.name);
+        }
+
+        // Color picker
+        var picker = document.getElementById('colorPicker');
+        picker.innerHTML = '';
+        var currentBgColor = (currentUser.profileBg && currentUser.profileBg.type === 'color') ? currentUser.profileBg.value : '#1a1a2e';
+        bgColors.forEach(function(color) {
+            var swatch = document.createElement('div');
+            swatch.className = 'color-swatch' + (color === currentBgColor ? ' active' : '');
+            swatch.style.background = color;
+            swatch.addEventListener('click', function() {
+                document.querySelectorAll('.color-swatch').forEach(function(s){s.classList.remove('active')});
+                swatch.classList.add('active');
+            });
+            picker.appendChild(swatch);
+        });
+
+        document.getElementById('editModal').classList.add('visible');
+    }
+
+    function closeEditModal() {
+        document.getElementById('editModal').classList.remove('visible');
+    }
+
+    function handleAvatarUpload(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            editAvatarData = ev.target.result;
+            var preview = document.getElementById('editAvatarPreview');
+            preview.innerHTML = '<img src="' + editAvatarData + '" alt="">';
+
+            // If modal is not open, save directly
+            if (!document.getElementById('editModal').classList.contains('visible')) {
+                saveAvatarDirectly(editAvatarData);
+            }
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    }
+
+    function handleBannerUpload(e) {
+        var file = e.target.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function(ev) {
+            var dataUrl = ev.target.result;
+            var users = JSON.parse(localStorage.getItem('melio_users') || '[]');
+            for (var i = 0; i < users.length; i++) {
+                if (users[i].id === currentUser.id) {
+                    users[i].profileBg = { type: 'image', value: dataUrl };
+                    currentUser = users[i];
+                    viewUser = users[i];
+                    break;
+                }
+            }
+            localStorage.setItem('melio_users', JSON.stringify(users));
+            showToast('Обложка обновлена!', 'success');
+            renderProfile();
+        };
+        reader.readAsDataURL(file);
+        e.target.value = '';
+    }
+
+    function saveAvatarDirectly(dataUrl) {
+        var users = JSON.parse(localStorage.getItem('melio_users') || '[]');
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].id === currentUser.id) {
+                users[i].avatar = dataUrl;
+                currentUser = users[i];
+                viewUser = users[i];
+                break;
+            }
+        }
+        localStorage.setItem('melio_users', JSON.stringify(users));
+        showToast('Аватар обновлён!', 'success');
+        renderProfile();
+    }
+
+    function removeAvatar() {
+        editAvatarData = null;
+        var preview = document.getElementById('editAvatarPreview');
+        preview.innerHTML = '';
+        preview.textContent = getInitials(currentUser.name);
+    }
+
+    function saveProfile() {
+        var name = document.getElementById('editName').value.trim();
+        var username = document.getElementById('editUsername').value.trim().replace(/^@/,'');
+        var bio = document.getElementById('editBio').value.trim();
+        var animation = document.getElementById('editAnimation').value;
+
+        if (!name || name.length < 2) {
+            showToast('Имя должно быть не менее 2 символов', 'error');
+            return;
+        }
+
+        // Get selected color
+        var activeSwatch = document.querySelector('.color-swatch.active');
+        var bgColor = activeSwatch ? activeSwatch.style.background : '#1a1a2e';
+
+        var users = JSON.parse(localStorage.getItem('melio_users') || '[]');
+
+        // Check duplicate username
+        if (username) {
+            var dup = users.find(function(u) {
+                return u.id !== currentUser.id && u.username && u.username.toLowerCase() === username.toLowerCase();
+            });
+            if (dup) {
+                showToast('Username уже занят', 'error');
+                return;
+            }
+        }
+
+        for (var i = 0; i < users.length; i++) {
+            if (users[i].id === currentUser.id) {
+                users[i].name = name;
+                users[i].username = username || null;
+                users[i].bio = bio || null;
+                users[i].profileAnimation = animation;
+
+                // Only update bg color if no image banner
+                if (!users[i].profileBg || users[i].profileBg.type !== 'image') {
+                    users[i].profileBg = { type: 'color', value: bgColor };
+                }
+
+                // Avatar
+                if (editAvatarData === null) {
+                    users[i].avatar = null;
+                } else if (editAvatarData !== undefined) {
+                    users[i].avatar = editAvatarData;
+                }
+
+                currentUser = users[i];
+                viewUser = users[i];
+
+                // Update session
+                var session = JSON.parse(localStorage.getItem('melio_session') || '{}');
+                session.userId = currentUser.id;
+                localStorage.setItem('melio_session', JSON.stringify(session));
+
+                break;
+            }
+        }
+
+        localStorage.setItem('melio_users', JSON.stringify(users));
+        showToast('Профиль обновлён!', 'success');
+        closeEditModal();
+        renderProfile();
+    }
+
+    /* ===================== INIT ===================== */
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTheme();
+        createParticles();
+
+        // Get session
+        var session = JSON.parse(localStorage.getItem('melio_session') || '{}');
+        if (!session.loggedIn) { window.location.href = 'melio-auth.html'; return; }
+
+        allUsers = JSON.parse(localStorage.getItem('melio_users') || '[]');
+        allNfts = JSON.parse(localStorage.getItem('melio_nfts') || '[]');
+
+        currentUser = allUsers.find(function(u){return u.id === session.userId});
+        if (!currentUser) { window.location.href = 'melio-auth.html'; return; }
+
+        // Determine which user to show
+        var viewId = getUrlParam('id');
+        if (viewId && viewId !== currentUser.id) {
+            viewUser = findUser(viewId);
+            if (!viewUser) {
+                showToast('Пользователь не найден', 'error');
+                viewUser = currentUser;
+                isOwnProfile = true;
+            } else {
+                isOwnProfile = false;
+            }
+        } else {
+            viewUser = currentUser;
+            isOwnProfile = true;
+        }
+
+        renderProfile();
+
+        // Close modal on backdrop
+        document.getElementById('editModal').addEventListener('click', function(e) {
+            if (e.target.id === 'editModal') closeEditModal();
+        });
+
+        // Keyboard
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeEditModal();
+        });
+    });
+</script>
+</body>
+</html>

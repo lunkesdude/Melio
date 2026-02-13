@@ -1,0 +1,609 @@
+<!-- melio-rewards.html -->
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melio — Награды и Достижения</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a2e;
+            --bg-card: #16162a;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888a8;
+            --text-muted: #555570;
+            --accent-purple: #7c3aed;
+            --accent-purple-light: #a855f7;
+            --accent-cyan: #06b6d4;
+            --accent-cyan-light: #22d3ee;
+            --accent-gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+            --accent-glow-purple: 0 0 20px rgba(124, 58, 237, 0.4);
+            --accent-glow-cyan: 0 0 20px rgba(6, 182, 212, 0.4);
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border-color: rgba(124, 58, 237, 0.2);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 20px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f0f0f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555570;
+            --text-muted: #8888a8;
+            --border-color: rgba(124, 58, 237, 0.15);
+        }
+
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%;font-family:var(--font-main);background:var(--bg-primary);color:var(--text-primary);overflow-x:hidden;overflow-y:auto}
+        body::-webkit-scrollbar{width:6px}
+        body::-webkit-scrollbar-track{background:transparent}
+        body::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:4px}
+        button{font-family:var(--font-main);cursor:pointer}
+
+        /* BACKGROUND */
+        .app-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden}
+        .app-bg::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.15) 0%,transparent 70%);top:-200px;left:-200px;animation:floatOrb1 15s ease-in-out infinite}
+        .app-bg::after{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(6,182,212,0.12) 0%,transparent 70%);bottom:-200px;right:-200px;animation:floatOrb2 18s ease-in-out infinite}
+        @keyframes floatOrb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(100px,50px) scale(1.1)}66%{transform:translate(50px,100px) scale(0.9)}}
+        @keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-80px,-60px) scale(1.15)}66%{transform:translate(-40px,-80px) scale(0.95)}}
+        .grid-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(124,58,237,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.03) 1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+        .particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:particleFloat linear infinite}
+        @keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
+
+        /* TOASTS */
+        .toast-container{position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:10px}
+        .toast{padding:14px 20px;border-radius:var(--border-radius-sm);color:#fff;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,0.4);animation:toastIn 0.4s cubic-bezier(0.16,1,0.3,1);display:flex;align-items:center;gap:10px;max-width:360px;backdrop-filter:blur(10px)}
+        .toast.success{background:linear-gradient(135deg,rgba(34,197,94,0.9),rgba(22,163,74,0.9));border:1px solid rgba(34,197,94,0.3)}
+        .toast.error{background:linear-gradient(135deg,rgba(239,68,68,0.9),rgba(220,38,38,0.9));border:1px solid rgba(239,68,68,0.3)}
+        .toast.info{background:linear-gradient(135deg,rgba(124,58,237,0.9),rgba(6,182,212,0.9));border:1px solid rgba(124,58,237,0.3)}
+        .toast-exit{animation:toastOut 0.3s ease forwards}
+        @keyframes toastIn{0%{opacity:0;transform:translateX(100px) scale(0.9)}100%{opacity:1;transform:translateX(0) scale(1)}}
+        @keyframes toastOut{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(100px)}}
+
+        /* TOP BAR */
+        .top-bar{position:sticky;top:0;z-index:10;padding:12px 20px;background:var(--bg-secondary);border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:12px;backdrop-filter:blur(16px)}
+        .back-btn{width:40px;height:40px;border-radius:var(--border-radius-sm);background:none;border:none;color:var(--text-secondary);font-size:20px;display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast)}
+        .back-btn:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+        .back-btn:active{transform:scale(0.93)}
+        .top-bar-title{font-size:17px;font-weight:700;flex:1}
+
+        /* CONTAINER */
+        .rewards-container{position:relative;z-index:1;max-width:650px;margin:0 auto;padding:20px 16px 40px;opacity:0;animation:pageAppear 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s forwards}
+        @keyframes pageAppear{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+
+        /* HERO STATS */
+        .hero-stats{display:flex;gap:10px;margin-bottom:28px}
+        .hero-card{flex:1;padding:20px 14px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);text-align:center;transition:all var(--transition-fast);box-shadow:0 6px 20px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);position:relative;overflow:hidden}
+        .hero-card:hover{border-color:var(--accent-purple);transform:translateY(-3px);box-shadow:var(--accent-glow-purple),0 10px 30px rgba(0,0,0,0.3)}
+        .hero-card::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px}
+        .hero-card.purple::before{background:var(--accent-gradient)}
+        .hero-card.cyan::before{background:linear-gradient(135deg,var(--accent-cyan),var(--accent-cyan-light))}
+        .hero-card.gold::before{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+        .hero-icon{font-size:32px;margin-bottom:8px;display:block}
+        .hero-value{font-size:28px;font-weight:800;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:2px}
+        .hero-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+
+        /* TABS */
+        .rewards-tabs{display:flex;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:4px;margin-bottom:24px;position:relative}
+        .rewards-tab{flex:1;padding:12px 8px;text-align:center;font-size:13px;font-weight:600;color:var(--text-muted);background:none;border:none;border-radius:var(--border-radius-sm);transition:all var(--transition-fast);position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px}
+        .rewards-tab:hover{color:var(--text-secondary)}
+        .rewards-tab.active{color:#fff}
+        .tab-indicator{position:absolute;top:4px;height:calc(100% - 8px);background:var(--accent-gradient);border-radius:var(--border-radius-sm);transition:all 0.35s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--accent-glow-purple)}
+        .tab-badge{font-size:10px;padding:1px 6px;background:rgba(255,255,255,0.15);border-radius:8px;font-weight:700}
+        .rewards-tab.active .tab-badge{background:rgba(255,255,255,0.25)}
+
+        /* TAB CONTENT */
+        .tab-content{display:none}
+        .tab-content.active{display:block;animation:tabFade 0.3s ease}
+        @keyframes tabFade{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+
+        /* PROGRESS BAR */
+        .progress-section{margin-bottom:24px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:20px;box-shadow:0 4px 16px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05)}
+        .progress-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+        .progress-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px}
+        .progress-level{font-size:13px;color:var(--accent-cyan-light);font-weight:700}
+        .progress-track{width:100%;height:10px;background:var(--bg-primary);border-radius:5px;overflow:hidden;margin-bottom:8px}
+        .progress-fill{height:100%;border-radius:5px;background:var(--accent-gradient);transition:width 1s cubic-bezier(0.16,1,0.3,1);position:relative;overflow:hidden}
+        .progress-fill::after{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);animation:progressShine 2s ease-in-out infinite}
+        @keyframes progressShine{0%{left:-100%}100%{left:100%}}
+        .progress-info{display:flex;justify-content:space-between;font-size:12px;color:var(--text-muted)}
+
+        /* REWARD CARD */
+        .reward-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;transition:all var(--transition-fast);box-shadow:0 4px 12px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.05);opacity:0;transform:translateY(10px);animation:cardIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+        @keyframes cardIn{to{opacity:1;transform:translateY(0)}}
+        .reward-card:hover{border-color:var(--accent-purple);transform:translateX(4px)}
+        .reward-icon-wrap{width:50px;height:50px;border-radius:var(--border-radius);display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0;position:relative}
+        .reward-icon-wrap.gold{background:linear-gradient(135deg,rgba(234,179,8,0.15),rgba(251,191,36,0.1));border:1px solid rgba(234,179,8,0.2)}
+        .reward-icon-wrap.purple{background:linear-gradient(135deg,rgba(124,58,237,0.15),rgba(168,85,247,0.1));border:1px solid rgba(124,58,237,0.2)}
+        .reward-icon-wrap.cyan{background:linear-gradient(135deg,rgba(6,182,212,0.15),rgba(34,211,238,0.1));border:1px solid rgba(6,182,212,0.2)}
+        .reward-icon-wrap.green{background:linear-gradient(135deg,rgba(34,197,94,0.15),rgba(74,222,128,0.1));border:1px solid rgba(34,197,94,0.2)}
+        .reward-icon-wrap.red{background:linear-gradient(135deg,rgba(239,68,68,0.15),rgba(248,113,113,0.1));border:1px solid rgba(239,68,68,0.2)}
+        .reward-info{flex:1;min-width:0}
+        .reward-title{font-size:15px;font-weight:700;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+        .reward-desc{font-size:13px;color:var(--text-secondary);line-height:1.4}
+        .reward-meta{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11px;color:var(--text-muted)}
+        .reward-meta-item{display:flex;align-items:center;gap:4px}
+        .reward-rarity{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:2px 8px;border-radius:8px}
+        .rarity-common{background:rgba(136,136,168,0.15);color:var(--text-secondary)}
+        .rarity-rare{background:rgba(6,182,212,0.15);color:var(--accent-cyan-light)}
+        .rarity-epic{background:rgba(168,85,247,0.15);color:var(--accent-purple-light)}
+        .rarity-legendary{background:rgba(234,179,8,0.15);color:var(--warning)}
+
+        /* ACHIEVEMENT CARD */
+        .achievement-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;transition:all var(--transition-fast);box-shadow:0 4px 12px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.05);opacity:0;transform:translateY(10px);animation:cardIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+        .achievement-card:hover{border-color:var(--accent-cyan);transform:translateX(4px)}
+        .achievement-level-badge{width:50px;height:50px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;flex-shrink:0;position:relative}
+        .achievement-level-badge.lvl-low{background:linear-gradient(135deg,#22c55e,#4ade80);box-shadow:0 0 15px rgba(34,197,94,0.3)}
+        .achievement-level-badge.lvl-mid{background:linear-gradient(135deg,var(--accent-cyan),var(--accent-cyan-light));box-shadow:0 0 15px rgba(6,182,212,0.3)}
+        .achievement-level-badge.lvl-high{background:linear-gradient(135deg,var(--accent-purple),var(--accent-purple-light));box-shadow:0 0 15px rgba(124,58,237,0.3)}
+        .achievement-level-badge.lvl-max{background:linear-gradient(135deg,#f59e0b,#fbbf24);box-shadow:0 0 15px rgba(245,158,11,0.3)}
+        .achievement-level-badge .lvl-ring{position:absolute;top:-2px;left:-2px;right:-2px;bottom:-2px;border-radius:50%;border:2px solid rgba(255,255,255,0.2)}
+        .achievement-info{flex:1;min-width:0}
+        .achievement-text{font-size:15px;font-weight:700;margin-bottom:3px}
+        .achievement-sub{font-size:13px;color:var(--text-secondary);line-height:1.4}
+        .achievement-meta{display:flex;align-items:center;gap:8px;margin-top:6px;font-size:11px;color:var(--text-muted)}
+
+        /* CRYSTAL LOG */
+        .crystal-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:14px 18px;margin-bottom:8px;display:flex;align-items:center;gap:14px;transition:all var(--transition-fast);box-shadow:0 4px 12px rgba(0,0,0,0.15),inset 0 1px 0 rgba(255,255,255,0.05);opacity:0;transform:translateY(10px);animation:cardIn 0.4s cubic-bezier(0.16,1,0.3,1) forwards}
+        .crystal-card:hover{border-color:var(--accent-cyan);transform:translateX(4px)}
+        .crystal-amount{font-size:18px;font-weight:800;flex-shrink:0;min-width:80px;text-align:right}
+        .crystal-amount.positive{color:var(--success)}
+        .crystal-amount.negative{color:var(--danger)}
+        .crystal-info{flex:1;min-width:0}
+        .crystal-type{font-size:14px;font-weight:600;margin-bottom:2px}
+        .crystal-date{font-size:12px;color:var(--text-muted)}
+
+        /* EMPTY */
+        .empty-state{text-align:center;padding:48px 20px;color:var(--text-muted)}
+        .empty-icon{font-size:48px;display:block;margin-bottom:12px}
+        .empty-title{font-size:16px;font-weight:600;color:var(--text-secondary);margin-bottom:6px}
+        .empty-desc{font-size:13px;line-height:1.5}
+
+        /* LEADERBOARD PREVIEW */
+        .leaderboard-section{margin-top:24px}
+        .leaderboard-title{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--text-secondary);margin-bottom:12px;display:flex;align-items:center;gap:8px;padding:0 4px}
+        .leaderboard-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05)}
+        .lb-item{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--border-color);transition:background var(--transition-fast)}
+        .lb-item:last-child{border-bottom:none}
+        .lb-item:hover{background:var(--bg-tertiary)}
+        .lb-item.me{background:rgba(124,58,237,0.06)}
+        .lb-rank{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;flex-shrink:0}
+        .lb-rank.r1{background:linear-gradient(135deg,#f59e0b,#fbbf24);color:#000}
+        .lb-rank.r2{background:linear-gradient(135deg,#94a3b8,#cbd5e1);color:#000}
+        .lb-rank.r3{background:linear-gradient(135deg,#c2884d,#d4a373);color:#000}
+        .lb-rank.rn{background:var(--bg-primary);color:var(--text-muted);border:1px solid var(--border-color)}
+        .lb-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;overflow:visible;position:relative}
+        .lb-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .lb-info{flex:1;min-width:0}
+        .lb-name{font-size:14px;font-weight:600;display:flex;align-items:center;gap:5px}
+        .lb-name .name-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+        .lb-sub{font-size:12px;color:var(--text-muted)}
+        .lb-crystals{font-size:14px;font-weight:700;color:var(--accent-cyan-light);flex-shrink:0}
+        .verified-badge{width:14px;height:14px;flex-shrink:0}
+        .plus-badge{font-size:8px;padding:1px 5px;background:var(--accent-gradient);border-radius:8px;color:#fff;font-weight:700;flex-shrink:0}
+
+        @media(max-width:480px){
+            .hero-stats{flex-wrap:wrap}
+            .hero-card{min-width:calc(50% - 5px)}
+            .rewards-tab{font-size:12px;padding:10px 4px}
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-bg"></div>
+<div class="grid-overlay"></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- TOP BAR -->
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div class="top-bar-title">🏆 Награды и Достижения</div>
+</div>
+
+<!-- CONTENT -->
+<div class="rewards-container">
+
+    <!-- HERO STATS -->
+    <div class="hero-stats" id="heroStats"></div>
+
+    <!-- PROGRESS -->
+    <div class="progress-section" id="progressSection"></div>
+
+    <!-- TABS -->
+    <div class="rewards-tabs" id="rewardsTabs">
+        <div class="tab-indicator" id="tabIndicator"></div>
+        <button class="rewards-tab active" data-tab="rewards" onclick="switchTab('rewards')">🏆 Награды <span class="tab-badge" id="rewardsTabCount">0</span></button>
+        <button class="rewards-tab" data-tab="achievements" onclick="switchTab('achievements')">⭐ Достижения <span class="tab-badge" id="achievementsTabCount">0</span></button>
+        <button class="rewards-tab" data-tab="crystals" onclick="switchTab('crystals')">💎 Кристаллы <span class="tab-badge" id="crystalsTabCount">0</span></button>
+    </div>
+
+    <!-- TAB: REWARDS -->
+    <div class="tab-content active" id="tab-rewards"></div>
+
+    <!-- TAB: ACHIEVEMENTS -->
+    <div class="tab-content" id="tab-achievements"></div>
+
+    <!-- TAB: CRYSTALS -->
+    <div class="tab-content" id="tab-crystals"></div>
+
+    <!-- LEADERBOARD -->
+    <div class="leaderboard-section" id="leaderboardSection">
+        <div class="leaderboard-title">👑 Топ по кристаллам</div>
+        <div class="leaderboard-card" id="leaderboardList"></div>
+    </div>
+
+</div>
+
+<script>
+    var currentUser = null;
+    var allUsers = [];
+
+    function getInitials(n){return n?n.split(' ').map(function(w){return w[0]}).join('').toUpperCase().slice(0,2):'?'}
+    function findUser(id){for(var i=0;i<allUsers.length;i++){if(allUsers[i].id===id)return allUsers[i]}return null}
+    function goBack(){window.location.href='melio-app.html'}
+    function loadTheme(){var t=localStorage.getItem('melio_theme')||'dark';document.documentElement.setAttribute('data-theme',t)}
+    function showToast(msg,type,dur){type=type||'info';dur=dur||3000;var c=document.getElementById('toastContainer');var t=document.createElement('div');t.className='toast '+type;var ic={success:'✅',error:'❌',info:'💎'};t.innerHTML='<span>'+(ic[type]||'💎')+'</span><span>'+msg+'</span>';c.appendChild(t);setTimeout(function(){t.classList.add('toast-exit');setTimeout(function(){t.remove()},300)},dur)}
+    function formatDate(iso){if(!iso)return '';return new Date(iso).toLocaleDateString('ru',{day:'numeric',month:'long',year:'numeric'})}
+    function formatDateShort(iso){if(!iso)return '';return new Date(iso).toLocaleDateString('ru',{day:'numeric',month:'short'})}
+    function createParticles(){var colors=['#7c3aed','#06b6d4','#a855f7','#22d3ee'];for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'vw';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=Math.random()*10+'s';var s=2+Math.random()*4;p.style.width=s+'px';p.style.height=s+'px';p.style.opacity=0.3+Math.random()*0.4;document.body.appendChild(p)}}
+
+    /* ===================== LEVEL SYSTEM ===================== */
+    function getLevel(crystals) {
+        // Every 500 crystals = 1 level, max level 100
+        return Math.min(100, Math.floor((crystals || 0) / 500) + 1);
+    }
+    function getLevelProgress(crystals) {
+        var c = crystals || 0;
+        var currentLvlCrystals = (getLevel(c) - 1) * 500;
+        var nextLvlCrystals = getLevel(c) * 500;
+        if (getLevel(c) >= 100) return 100;
+        return Math.floor(((c - currentLvlCrystals) / (nextLvlCrystals - currentLvlCrystals)) * 100);
+    }
+    function getLevelTitle(level) {
+        if (level >= 80) return 'Легенда';
+        if (level >= 60) return 'Мастер';
+        if (level >= 40) return 'Эксперт';
+        if (level >= 20) return 'Опытный';
+        if (level >= 10) return 'Активный';
+        if (level >= 5) return 'Начинающий';
+        return 'Новичок';
+    }
+
+    /* ===================== RENDER HERO ===================== */
+    function renderHero() {
+        var rewards = currentUser.rewards || [];
+        var achievements = currentUser.achievements || [];
+        var crystals = currentUser.crystals || 0;
+        var level = getLevel(crystals);
+
+        document.getElementById('heroStats').innerHTML =
+            '<div class="hero-card purple">' +
+                '<span class="hero-icon">🏆</span>' +
+                '<div class="hero-value">' + rewards.length + '</div>' +
+                '<div class="hero-label">Награды</div>' +
+            '</div>' +
+            '<div class="hero-card cyan">' +
+                '<span class="hero-icon">⭐</span>' +
+                '<div class="hero-value">' + achievements.length + '</div>' +
+                '<div class="hero-label">Достижения</div>' +
+            '</div>' +
+            '<div class="hero-card gold">' +
+                '<span class="hero-icon">💎</span>' +
+                '<div class="hero-value">' + crystals.toLocaleString() + '</div>' +
+                '<div class="hero-label">Кристаллы</div>' +
+            '</div>';
+    }
+
+    /* ===================== RENDER PROGRESS ===================== */
+    function renderProgress() {
+        var crystals = currentUser.crystals || 0;
+        var level = getLevel(crystals);
+        var progress = getLevelProgress(crystals);
+        var title = getLevelTitle(level);
+        var nextLvl = level * 500;
+        var currentLvlStart = (level - 1) * 500;
+
+        document.getElementById('progressSection').innerHTML =
+            '<div class="progress-header">' +
+                '<div class="progress-title">🎖️ ' + title + '</div>' +
+                '<div class="progress-level">Уровень ' + level + '</div>' +
+            '</div>' +
+            '<div class="progress-track">' +
+                '<div class="progress-fill" id="progressFill" style="width:0%"></div>' +
+            '</div>' +
+            '<div class="progress-info">' +
+                '<span>💎 ' + crystals.toLocaleString() + '</span>' +
+                '<span>' + (level >= 100 ? 'МАКС' : 'до ур. ' + (level+1) + ': ' + nextLvl) + '</span>' +
+            '</div>';
+
+        // Animate progress bar
+        setTimeout(function() {
+            var fill = document.getElementById('progressFill');
+            if (fill) fill.style.width = progress + '%';
+        }, 100);
+    }
+
+    /* ===================== TABS ===================== */
+    var activeTab = 'rewards';
+
+    function switchTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll('.rewards-tab').forEach(function(t) {
+            t.classList.toggle('active', t.getAttribute('data-tab') === tab);
+        });
+        document.querySelectorAll('.tab-content').forEach(function(c) {
+            c.classList.toggle('active', c.id === 'tab-' + tab);
+        });
+        updateIndicator();
+    }
+
+    function updateIndicator() {
+        var tabs = document.querySelectorAll('.rewards-tab');
+        var indicator = document.getElementById('tabIndicator');
+        var activeEl = document.querySelector('.rewards-tab.active');
+        if (!activeEl || !indicator) return;
+
+        var tabsContainer = document.getElementById('rewardsTabs');
+        var containerRect = tabsContainer.getBoundingClientRect();
+        var activeRect = activeEl.getBoundingClientRect();
+
+        indicator.style.left = (activeRect.left - containerRect.left) + 'px';
+        indicator.style.width = activeRect.width + 'px';
+    }
+
+    /* ===================== RENDER REWARDS ===================== */
+    function renderRewards() {
+        var rewards = currentUser.rewards || [];
+        document.getElementById('rewardsTabCount').textContent = rewards.length;
+        var container = document.getElementById('tab-rewards');
+
+        if (!rewards.length) {
+            container.innerHTML =
+                '<div class="empty-state">' +
+                    '<span class="empty-icon">🏆</span>' +
+                    '<div class="empty-title">Пока нет наград</div>' +
+                    '<div class="empty-desc">Награды выдаются администраторами<br>за активность и вклад в сообщество</div>' +
+                '</div>';
+            return;
+        }
+
+        var colorClasses = ['gold','purple','cyan','green','red'];
+        var icons = ['🏆','🎖️','🥇','🌟','💫','🏅','🎯','👑','🔥','💪'];
+        var html = '';
+
+        rewards.forEach(function(r, i) {
+            var grantedBy = findUser(r.grantedBy);
+            var colorCls = colorClasses[i % colorClasses.length];
+            var icon = icons[i % icons.length];
+
+            html += '<div class="reward-card" style="animation-delay:' + (i * 0.06) + 's">' +
+                '<div class="reward-icon-wrap ' + colorCls + '">' + icon + '</div>' +
+                '<div class="reward-info">' +
+                    '<div class="reward-title">' + r.title + '</div>' +
+                    '<div class="reward-desc">' + (r.description || 'Без описания') + '</div>' +
+                    '<div class="reward-meta">' +
+                        (grantedBy ? '<span class="reward-meta-item">👤 ' + grantedBy.name + '</span>' : '') +
+                        '<span class="reward-meta-item">📅 ' + formatDateShort(r.grantedAt) + '</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    /* ===================== RENDER ACHIEVEMENTS ===================== */
+    function renderAchievements() {
+        var achievements = currentUser.achievements || [];
+        document.getElementById('achievementsTabCount').textContent = achievements.length;
+        var container = document.getElementById('tab-achievements');
+
+        if (!achievements.length) {
+            container.innerHTML =
+                '<div class="empty-state">' +
+                    '<span class="empty-icon">⭐</span>' +
+                    '<div class="empty-title">Пока нет достижений</div>' +
+                    '<div class="empty-desc">Достижения открываются за особые<br>действия и активность в Melio</div>' +
+                '</div>';
+            return;
+        }
+
+        var html = '';
+        achievements.forEach(function(a, i) {
+            var lvl = a.level || 1;
+            var lvlCls = 'lvl-low';
+            if (lvl >= 8) lvlCls = 'lvl-max';
+            else if (lvl >= 5) lvlCls = 'lvl-high';
+            else if (lvl >= 3) lvlCls = 'lvl-mid';
+
+            var grantedBy = findUser(a.grantedBy);
+
+            html += '<div class="achievement-card" style="animation-delay:' + (i * 0.06) + 's">' +
+                '<div class="achievement-level-badge ' + lvlCls + '">' +
+                    '<div class="lvl-ring"></div>' +
+                    lvl +
+                '</div>' +
+                '<div class="achievement-info">' +
+                    '<div class="achievement-text">' + a.text + '</div>' +
+                    '<div class="achievement-sub">Уровень ' + lvl + ' достижение</div>' +
+                    '<div class="achievement-meta">' +
+                        (grantedBy ? '<span class="reward-meta-item">👤 ' + grantedBy.name + '</span>' : '') +
+                        '<span class="reward-meta-item">📅 ' + formatDateShort(a.grantedAt) + '</span>' +
+                    '</div>' +
+                '</div>' +
+            '</div>';
+        });
+
+        container.innerHTML = html;
+    }
+
+    /* ===================== RENDER CRYSTALS ===================== */
+    function renderCrystals() {
+        var transactions = JSON.parse(localStorage.getItem('melio_crystal_transactions') || '[]');
+        var myTransactions = transactions.filter(function(t) {
+            return t.userId === currentUser.id || t.fromUserId === currentUser.id || t.toUserId === currentUser.id;
+        });
+
+        // Sort newest first
+        myTransactions.sort(function(a, b) {
+            return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        });
+
+        document.getElementById('crystalsTabCount').textContent = (currentUser.crystals || 0).toLocaleString();
+        var container = document.getElementById('tab-crystals');
+
+        // Summary
+        var totalEarned = 0;
+        var totalSpent = 0;
+        myTransactions.forEach(function(t) {
+            if (t.userId === currentUser.id || t.toUserId === currentUser.id) {
+                if (t.amount > 0) totalEarned += t.amount;
+            }
+            if (t.fromUserId === currentUser.id) {
+                totalSpent += Math.abs(t.amount);
+            }
+        });
+
+        var html = '<div class="hero-stats" style="margin-bottom:20px">' +
+            '<div class="hero-card purple" style="padding:14px 10px">' +
+                '<span class="hero-icon" style="font-size:24px">💎</span>' +
+                '<div class="hero-value" style="font-size:22px">' + (currentUser.crystals || 0).toLocaleString() + '</div>' +
+                '<div class="hero-label">Баланс</div>' +
+            '</div>' +
+            '<div class="hero-card cyan" style="padding:14px 10px">' +
+                '<span class="hero-icon" style="font-size:24px">📈</span>' +
+                '<div class="hero-value" style="font-size:22px;-webkit-text-fill-color:var(--success);color:var(--success)">+' + totalEarned.toLocaleString() + '</div>' +
+                '<div class="hero-label">Получено</div>' +
+            '</div>' +
+            '<div class="hero-card gold" style="padding:14px 10px">' +
+                '<span class="hero-icon" style="font-size:24px">📉</span>' +
+                '<div class="hero-value" style="font-size:22px;-webkit-text-fill-color:var(--danger);color:var(--danger)">-' + totalSpent.toLocaleString() + '</div>' +
+                '<div class="hero-label">Потрачено</div>' +
+            '</div>' +
+        '</div>';
+
+        if (!myTransactions.length) {
+            html += '<div class="empty-state">' +
+                '<span class="empty-icon">💎</span>' +
+                '<div class="empty-title">Нет транзакций</div>' +
+                '<div class="empty-desc">История операций с кристаллами<br>будет отображаться здесь</div>' +
+            '</div>';
+        } else {
+            myTransactions.forEach(function(t, i) {
+                var isIncoming = t.toUserId === currentUser.id || (t.userId === currentUser.id && t.type === 'add');
+                var amount = t.amount || 0;
+                var amountCls = isIncoming ? 'positive' : 'negative';
+                var amountText = (isIncoming ? '+' : '-') + Math.abs(amount).toLocaleString();
+
+                var typeLabels = {
+                    add: '💎 Начисление',
+                    subtract: '💸 Списание',
+                    gift: '🎁 Подарок'
+                };
+
+                var fromUser = t.fromUserId ? findUser(t.fromUserId) : null;
+                var toUser = t.toUserId ? findUser(t.toUserId) : null;
+                var desc = typeLabels[t.type] || '💎 Операция';
+                if (t.type === 'gift' && fromUser && fromUser.id !== currentUser.id) {
+                    desc = '🎁 От ' + fromUser.name;
+                }
+                if (t.type === 'gift' && toUser && toUser.id !== currentUser.id) {
+                    desc = '🎁 Для ' + toUser.name;
+                }
+
+                html += '<div class="crystal-card" style="animation-delay:' + (i * 0.05) + 's">' +
+                    '<div class="crystal-info">' +
+                        '<div class="crystal-type">' + desc + '</div>' +
+                        '<div class="crystal-date">' + formatDateShort(t.createdAt) + '</div>' +
+                    '</div>' +
+                    '<div class="crystal-amount ' + amountCls + '">' + amountText + ' 💎</div>' +
+                '</div>';
+            });
+        }
+
+        container.innerHTML = html;
+    }
+
+    /* ===================== LEADERBOARD ===================== */
+    function renderLeaderboard() {
+        var sorted = allUsers.slice().sort(function(a, b) {
+            return (b.crystals || 0) - (a.crystals || 0);
+        });
+
+        var top = sorted.slice(0, 10);
+        var html = '';
+
+        top.forEach(function(user, i) {
+            var rank = i + 1;
+            var rankCls = 'rn';
+            if (rank === 1) rankCls = 'r1';
+            else if (rank === 2) rankCls = 'r2';
+            else if (rank === 3) rankCls = 'r3';
+
+            var isMe = user.id === currentUser.id;
+            var verHTML = user.verified ? '<img src="https://cdn3d.iconscout.com/3d/premium/thumb/tick-3d-icon-png-download-10199917.png" class="verified-badge" alt="✓">' : '';
+            var plusHTML = user.melioPlus ? '<span class="plus-badge">PLUS</span>' : '';
+
+            var avatarInner = '';
+            if (user.avatar) {
+                avatarInner = '<img src="' + user.avatar + '" alt="">';
+            } else {
+                avatarInner = getInitials(user.name);
+            }
+
+            html += '<div class="lb-item' + (isMe ? ' me' : '') + '">' +
+                '<div class="lb-rank ' + rankCls + '">' + rank + '</div>' +
+                '<div class="lb-avatar">' + avatarInner + '</div>' +
+                '<div class="lb-info">' +
+                    '<div class="lb-name"><span class="name-text">' + user.name + '</span> ' + verHTML + ' ' + plusHTML + '</div>' +
+                    '<div class="lb-sub">Уровень ' + getLevel(user.crystals) + ' · ' + getLevelTitle(getLevel(user.crystals)) + '</div>' +
+                '</div>' +
+                '<div class="lb-crystals">💎 ' + (user.crystals || 0).toLocaleString() + '</div>' +
+            '</div>';
+        });
+
+        document.getElementById('leaderboardList').innerHTML = html;
+    }
+
+    /* ===================== INIT ===================== */
+    document.addEventListener('DOMContentLoaded', function() {
+        loadTheme();
+        createParticles();
+
+        var session = JSON.parse(localStorage.getItem('melio_session') || '{}');
+        if (!session.loggedIn) { window.location.href = 'melio-auth.html'; return; }
+
+        allUsers = JSON.parse(localStorage.getItem('melio_users') || '[]');
+        currentUser = allUsers.find(function(u) { return u.id === session.userId; });
+        if (!currentUser) { window.location.href = 'melio-auth.html'; return; }
+
+        renderHero();
+        renderProgress();
+        renderRewards();
+        renderAchievements();
+        renderCrystals();
+        renderLeaderboard();
+
+        // Position tab indicator after render
+        setTimeout(updateIndicator, 50);
+        window.addEventListener('resize', updateIndicator);
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') goBack();
+        });
+    });
+</script>
+</body>
+</html>

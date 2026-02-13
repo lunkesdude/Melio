@@ -1,0 +1,668 @@
+<!-- melio-nft.html -->
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melio — NFT Подарки</title>
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-tertiary: #1a1a2e;
+            --bg-card: #16162a;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8888a8;
+            --text-muted: #555570;
+            --accent-purple: #7c3aed;
+            --accent-purple-light: #a855f7;
+            --accent-cyan: #06b6d4;
+            --accent-cyan-light: #22d3ee;
+            --accent-gradient: linear-gradient(135deg, #7c3aed, #06b6d4);
+            --accent-glow-purple: 0 0 20px rgba(124, 58, 237, 0.4);
+            --accent-glow-cyan: 0 0 20px rgba(6, 182, 212, 0.4);
+            --danger: #ef4444;
+            --success: #22c55e;
+            --warning: #f59e0b;
+            --border-color: rgba(124, 58, 237, 0.2);
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 20px;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.3s ease;
+            --transition-slow: 0.5s ease;
+            --font-main: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        [data-theme="light"] {
+            --bg-primary: #f0f0f5;
+            --bg-secondary: #ffffff;
+            --bg-tertiary: #e8e8f0;
+            --bg-card: #ffffff;
+            --text-primary: #1a1a2e;
+            --text-secondary: #555570;
+            --text-muted: #8888a8;
+            --border-color: rgba(124, 58, 237, 0.15);
+        }
+
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        html,body{height:100%;font-family:var(--font-main);background:var(--bg-primary);color:var(--text-primary);overflow-x:hidden;overflow-y:auto}
+        body::-webkit-scrollbar{width:6px}
+        body::-webkit-scrollbar-track{background:transparent}
+        body::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:4px}
+        button{font-family:var(--font-main);cursor:pointer}
+
+        .app-bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;overflow:hidden}
+        .app-bg::before{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(124,58,237,0.15) 0%,transparent 70%);top:-200px;left:-200px;animation:floatOrb1 15s ease-in-out infinite}
+        .app-bg::after{content:'';position:absolute;width:500px;height:500px;background:radial-gradient(circle,rgba(6,182,212,0.12) 0%,transparent 70%);bottom:-200px;right:-200px;animation:floatOrb2 18s ease-in-out infinite}
+        @keyframes floatOrb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(100px,50px) scale(1.1)}66%{transform:translate(50px,100px) scale(0.9)}}
+        @keyframes floatOrb2{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(-80px,-60px) scale(1.15)}66%{transform:translate(-40px,-80px) scale(0.95)}}
+        .grid-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-image:linear-gradient(rgba(124,58,237,0.03) 1px,transparent 1px),linear-gradient(90deg,rgba(124,58,237,0.03) 1px,transparent 1px);background-size:60px 60px;z-index:0;pointer-events:none}
+        .particle{position:fixed;border-radius:50%;pointer-events:none;z-index:0;animation:particleFloat linear infinite}
+        @keyframes particleFloat{0%{opacity:0;transform:translateY(100vh) scale(0)}10%{opacity:1}90%{opacity:1}100%{opacity:0;transform:translateY(-10vh) scale(1)}}
+
+        .toast-container{position:fixed;top:20px;right:20px;z-index:10000;display:flex;flex-direction:column;gap:10px}
+        .toast{padding:14px 20px;border-radius:var(--border-radius-sm);color:#fff;font-size:14px;font-weight:500;box-shadow:0 10px 30px rgba(0,0,0,0.4);animation:toastIn 0.4s cubic-bezier(0.16,1,0.3,1);display:flex;align-items:center;gap:10px;max-width:360px;backdrop-filter:blur(10px)}
+        .toast.success{background:linear-gradient(135deg,rgba(34,197,94,0.9),rgba(22,163,74,0.9));border:1px solid rgba(34,197,94,0.3)}
+        .toast.error{background:linear-gradient(135deg,rgba(239,68,68,0.9),rgba(220,38,38,0.9));border:1px solid rgba(239,68,68,0.3)}
+        .toast.info{background:linear-gradient(135deg,rgba(124,58,237,0.9),rgba(6,182,212,0.9));border:1px solid rgba(124,58,237,0.3)}
+        .toast-exit{animation:toastOut 0.3s ease forwards}
+        @keyframes toastIn{0%{opacity:0;transform:translateX(100px) scale(0.9)}100%{opacity:1;transform:translateX(0) scale(1)}}
+        @keyframes toastOut{0%{opacity:1;transform:translateX(0)}100%{opacity:0;transform:translateX(100px)}}
+
+        /* TOP BAR */
+        .top-bar{position:sticky;top:0;z-index:10;padding:12px 20px;background:var(--bg-secondary);border-bottom:1px solid var(--border-color);display:flex;align-items:center;gap:12px;backdrop-filter:blur(16px)}
+        .back-btn{width:40px;height:40px;border-radius:var(--border-radius-sm);background:none;border:none;color:var(--text-secondary);font-size:20px;display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast)}
+        .back-btn:hover{background:var(--bg-tertiary);color:var(--text-primary)}
+        .back-btn:active{transform:scale(0.93)}
+        .top-bar-title{font-size:17px;font-weight:700;flex:1}
+
+        .nft-container{position:relative;z-index:1;max-width:700px;margin:0 auto;padding:20px 16px 40px;opacity:0;animation:pageAppear 0.6s cubic-bezier(0.16,1,0.3,1) 0.1s forwards}
+        @keyframes pageAppear{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+
+        /* HERO */
+        .nft-hero{text-align:center;margin-bottom:28px;padding:28px 20px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-lg);box-shadow:0 8px 30px rgba(0,0,0,0.25),inset 0 1px 0 rgba(255,255,255,0.05);position:relative;overflow:hidden}
+        .nft-hero::before{content:'';position:absolute;top:0;left:0;width:100%;height:3px;background:var(--accent-gradient)}
+        .nft-hero-icon{font-size:48px;margin-bottom:12px;display:block;animation:heroFloat 3s ease-in-out infinite}
+        @keyframes heroFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+        .nft-hero-title{font-size:24px;font-weight:800;margin-bottom:4px;background:var(--accent-gradient);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+        .nft-hero-sub{font-size:14px;color:var(--text-secondary);margin-bottom:16px}
+        .nft-hero-stats{display:flex;gap:24px;justify-content:center;flex-wrap:wrap}
+        .nft-hero-stat{text-align:center}
+        .nft-hero-stat-val{font-size:22px;font-weight:800;color:var(--text-primary)}
+        .nft-hero-stat-label{font-size:11px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600}
+
+        /* TABS */
+        .nft-tabs{display:flex;background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);padding:4px;margin-bottom:24px;position:relative}
+        .nft-tab{flex:1;padding:11px 8px;text-align:center;font-size:13px;font-weight:600;color:var(--text-muted);background:none;border:none;border-radius:var(--border-radius-sm);transition:all var(--transition-fast);position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:6px}
+        .nft-tab:hover{color:var(--text-secondary)}
+        .nft-tab.active{color:#fff}
+        .nft-tab-indicator{position:absolute;top:4px;height:calc(100% - 8px);background:var(--accent-gradient);border-radius:var(--border-radius-sm);transition:all 0.35s cubic-bezier(0.16,1,0.3,1);box-shadow:var(--accent-glow-purple)}
+        .nft-tab-badge{font-size:10px;padding:1px 6px;background:rgba(255,255,255,0.15);border-radius:8px;font-weight:700}
+        .nft-tab.active .nft-tab-badge{background:rgba(255,255,255,0.25)}
+
+        .tab-content{display:none}
+        .tab-content.active{display:block;animation:tabFade 0.3s ease}
+        @keyframes tabFade{0%{opacity:0;transform:translateY(8px)}100%{opacity:1;transform:translateY(0)}}
+
+        /* FILTER BAR */
+        .filter-bar{display:flex;gap:6px;margin-bottom:16px;flex-wrap:wrap}
+        .filter-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);font-size:12px;font-weight:600;transition:all var(--transition-fast);display:flex;align-items:center;gap:4px}
+        .filter-btn:hover{border-color:var(--accent-purple);color:var(--text-primary)}
+        .filter-btn.active{background:var(--accent-gradient);border-color:transparent;color:#fff;box-shadow:var(--accent-glow-purple)}
+        .filter-btn:active{transform:scale(0.95)}
+
+        /* NFT GRID */
+        .nft-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:14px}
+
+        /* NFT CARD */
+        .nft-card{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius);overflow:hidden;transition:all var(--transition-fast);box-shadow:0 4px 16px rgba(0,0,0,0.2),inset 0 1px 0 rgba(255,255,255,0.05);cursor:pointer;opacity:0;transform:translateY(15px);animation:nftCardIn 0.5s cubic-bezier(0.16,1,0.3,1) forwards;position:relative}
+        @keyframes nftCardIn{to{opacity:1;transform:translateY(0)}}
+        .nft-card:hover{border-color:var(--accent-purple);transform:translateY(-4px);box-shadow:var(--accent-glow-purple),0 12px 30px rgba(0,0,0,0.3)}
+        .nft-card:active{transform:translateY(-2px)}
+
+        .nft-card-visual{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:56px;position:relative;overflow:hidden}
+        .nft-card-visual.common{background:linear-gradient(135deg,#1e1e2e,#2a2a3e)}
+        .nft-card-visual.rare{background:linear-gradient(135deg,#0c2d3e,#0e3a4a)}
+        .nft-card-visual.epic{background:linear-gradient(135deg,#1e0a3e,#2d1450)}
+        .nft-card-visual.legendary{background:linear-gradient(135deg,#3e2a0a,#4a3510)}
+
+        .nft-card-visual::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(255,255,255,0.05) 0%,transparent 60%);animation:nftShine 4s ease-in-out infinite}
+        @keyframes nftShine{0%,100%{transform:translate(-30%,-30%)}50%{transform:translate(30%,30%)}}
+
+        .nft-card-visual img{width:100%;height:100%;object-fit:cover}
+
+        .nft-rarity-tag{position:absolute;top:8px;right:8px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:3px 8px;border-radius:6px;backdrop-filter:blur(8px)}
+        .nft-rarity-tag.common{background:rgba(136,136,168,0.3);color:#ccc}
+        .nft-rarity-tag.rare{background:rgba(6,182,212,0.3);color:var(--accent-cyan-light)}
+        .nft-rarity-tag.epic{background:rgba(168,85,247,0.3);color:var(--accent-purple-light)}
+        .nft-rarity-tag.legendary{background:rgba(234,179,8,0.3);color:#fbbf24}
+
+        .nft-card-body{padding:12px 14px}
+        .nft-card-name{font-size:14px;font-weight:700;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .nft-card-desc{font-size:12px;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:8px}
+        .nft-card-footer{display:flex;align-items:center;justify-content:space-between}
+        .nft-card-owner{font-size:11px;color:var(--text-muted);display:flex;align-items:center;gap:4px}
+        .nft-card-owner-avatar{width:16px;height:16px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;overflow:hidden}
+        .nft-card-owner-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .nft-card-id{font-size:10px;color:var(--text-muted);font-family:monospace}
+
+        /* NFT DETAIL MODAL */
+        .nft-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(8px);z-index:200;align-items:center;justify-content:center}
+        .nft-modal-overlay.visible{display:flex}
+        .nft-modal{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-lg);width:90%;max-width:420px;box-shadow:0 30px 70px rgba(0,0,0,0.5),0 0 40px rgba(124,58,237,0.1);animation:modalIn 0.5s cubic-bezier(0.16,1,0.3,1);overflow:hidden}
+        @keyframes modalIn{0%{opacity:0;transform:translateY(40px) scale(0.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+
+        .nft-modal-visual{width:100%;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:80px;position:relative;overflow:hidden}
+        .nft-modal-visual.common{background:linear-gradient(135deg,#1e1e2e,#2a2a3e)}
+        .nft-modal-visual.rare{background:linear-gradient(135deg,#0c2d3e,#0e3a4a)}
+        .nft-modal-visual.epic{background:linear-gradient(135deg,#1e0a3e,#2d1450)}
+        .nft-modal-visual.legendary{background:linear-gradient(135deg,#3e2a0a,#4a3510)}
+        .nft-modal-visual img{width:100%;height:100%;object-fit:cover}
+
+        .nft-modal-close{position:absolute;top:12px;right:12px;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,0.5);border:none;color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all var(--transition-fast);backdrop-filter:blur(8px);z-index:2}
+        .nft-modal-close:hover{background:rgba(0,0,0,0.7);transform:scale(1.1)}
+
+        .nft-modal-rarity{position:absolute;top:12px;left:12px;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;padding:4px 12px;border-radius:8px;backdrop-filter:blur(8px)}
+
+        .nft-modal-body{padding:24px}
+        .nft-modal-name{font-size:22px;font-weight:800;margin-bottom:6px}
+        .nft-modal-desc{font-size:14px;color:var(--text-secondary);line-height:1.5;margin-bottom:20px}
+
+        .nft-detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+        .nft-detail-item{background:var(--bg-tertiary);border-radius:var(--border-radius-sm);padding:12px;text-align:center}
+        .nft-detail-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;font-weight:600;margin-bottom:4px}
+        .nft-detail-value{font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:4px}
+
+        .nft-modal-actions{display:flex;flex-direction:column;gap:8px}
+        .nft-action-btn{width:100%;padding:13px;border-radius:var(--border-radius-sm);border:1px solid var(--border-color);background:var(--bg-tertiary);color:var(--text-primary);font-size:14px;font-weight:600;font-family:var(--font-main);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:all var(--transition-fast)}
+        .nft-action-btn:hover{border-color:var(--accent-purple);transform:translateY(-1px)}
+        .nft-action-btn:active{transform:translateY(0)}
+        .nft-action-btn.primary{background:var(--accent-gradient);border:none;color:#fff}
+        .nft-action-btn.primary:hover{box-shadow:var(--accent-glow-purple)}
+        .nft-action-btn.danger{color:var(--danger);border-color:rgba(239,68,68,0.2)}
+        .nft-action-btn.danger:hover{background:rgba(239,68,68,0.08)}
+
+        /* GIFT MODAL */
+        .gift-modal-overlay{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);z-index:250;align-items:center;justify-content:center}
+        .gift-modal-overlay.visible{display:flex}
+        .gift-modal{background:var(--bg-card);border:1px solid var(--border-color);border-radius:var(--border-radius-lg);padding:32px;width:90%;max-width:440px;box-shadow:0 25px 60px rgba(0,0,0,0.5);animation:modalIn 0.5s cubic-bezier(0.16,1,0.3,1)}
+        .modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px}
+        .modal-title{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px}
+        .modal-close{width:32px;height:32px;border-radius:var(--border-radius-sm);background:var(--bg-primary);border:1px solid var(--border-color);color:var(--text-muted);font-size:14px;display:flex;align-items:center;justify-content:center;transition:all var(--transition-fast)}
+        .modal-close:hover{border-color:var(--danger);color:var(--danger)}
+        .user-select-list{max-height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:4px}
+        .user-select-list::-webkit-scrollbar{width:4px}
+        .user-select-list::-webkit-scrollbar-thumb{background:var(--border-color);border-radius:4px}
+        .user-select-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--border-radius-sm);border:none;background:none;color:var(--text-primary);font-family:var(--font-main);font-size:14px;width:100%;text-align:left;transition:background var(--transition-fast)}
+        .user-select-item:hover{background:var(--bg-tertiary)}
+        .user-select-item:active{transform:scale(0.99)}
+        .us-avatar{width:36px;height:36px;border-radius:50%;background:var(--accent-gradient);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden}
+        .us-avatar img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+        .us-info{flex:1;min-width:0}
+        .us-name{font-weight:600;font-size:14px}
+        .us-sub{font-size:12px;color:var(--text-muted)}
+        .verified-badge{width:14px;height:14px;flex-shrink:0}
+
+        /* EMPTY */
+        .empty-state{text-align:center;padding:48px 20px;color:var(--text-muted)}
+        .empty-icon{font-size:48px;display:block;margin-bottom:12px}
+        .empty-title{font-size:16px;font-weight:600;color:var(--text-secondary);margin-bottom:6px}
+        .empty-desc{font-size:13px;line-height:1.5}
+
+        @media(max-width:480px){
+            .nft-grid{grid-template-columns:repeat(2,1fr);gap:10px}
+            .nft-hero-stats{gap:16px}
+            .nft-detail-grid{grid-template-columns:1fr}
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-bg"></div>
+<div class="grid-overlay"></div>
+<div class="toast-container" id="toastContainer"></div>
+
+<div class="top-bar">
+    <button class="back-btn" onclick="goBack()">←</button>
+    <div class="top-bar-title">🎁 NFT Подарки</div>
+</div>
+
+<div class="nft-container">
+
+    <!-- HERO -->
+    <div class="nft-hero">
+        <span class="nft-hero-icon">🎁</span>
+        <div class="nft-hero-title">NFT Коллекция</div>
+        <div class="nft-hero-sub">Коллекционные подарки в мире Melio</div>
+        <div class="nft-hero-stats" id="heroStats"></div>
+    </div>
+
+    <!-- TABS -->
+    <div class="nft-tabs" id="nftTabs">
+        <div class="nft-tab-indicator" id="tabIndicator"></div>
+        <button class="nft-tab active" data-tab="my" onclick="switchTab('my')">🎒 Мои NFT <span class="nft-tab-badge" id="myTabCount">0</span></button>
+        <button class="nft-tab" data-tab="market" onclick="switchTab('market')">🏪 Все NFT <span class="nft-tab-badge" id="marketTabCount">0</span></button>
+    </div>
+
+    <!-- MY NFT -->
+    <div class="tab-content active" id="tab-my">
+        <div class="filter-bar" id="myFilters"></div>
+        <div class="nft-grid" id="myNftGrid"></div>
+    </div>
+
+    <!-- ALL NFT -->
+    <div class="tab-content" id="tab-market">
+        <div class="filter-bar" id="marketFilters"></div>
+        <div class="nft-grid" id="marketNftGrid"></div>
+    </div>
+
+</div>
+
+<!-- NFT DETAIL MODAL -->
+<div class="nft-modal-overlay" id="nftDetailOverlay">
+    <div class="nft-modal">
+        <div class="nft-modal-visual" id="nftModalVisual">
+            <button class="nft-modal-close" onclick="closeNftDetail()">✕</button>
+            <div class="nft-modal-rarity" id="nftModalRarity"></div>
+            <span id="nftModalIcon"></span>
+        </div>
+        <div class="nft-modal-body">
+            <div class="nft-modal-name" id="nftModalName">—</div>
+            <div class="nft-modal-desc" id="nftModalDesc">—</div>
+            <div class="nft-detail-grid" id="nftDetailGrid"></div>
+            <div class="nft-modal-actions" id="nftModalActions"></div>
+        </div>
+    </div>
+</div>
+
+<!-- GIFT MODAL -->
+<div class="gift-modal-overlay" id="giftModalOverlay">
+    <div class="gift-modal">
+        <div class="modal-header">
+            <div class="modal-title">🎁 Подарить NFT</div>
+            <button class="modal-close" onclick="closeGiftModal()">✕</button>
+        </div>
+        <div class="user-select-list" id="giftUserList"></div>
+    </div>
+</div>
+
+<script>
+    var currentUser = null;
+    var allUsers = [];
+    var allNfts = [];
+    var activeTab = 'my';
+    var activeFilter = 'all';
+    var selectedNftId = null;
+    var giftingNftId = null;
+
+    var rarityIcons = {common:'💿',rare:'💠',epic:'🔮',legendary:'👑'};
+    var rarityNames = {common:'Обычный',rare:'Редкий',epic:'Эпический',legendary:'Легендарный'};
+    var rarityOrder = {legendary:0,epic:1,rare:2,common:3};
+
+    function getInitials(n){return n?n.split(' ').map(function(w){return w[0]}).join('').toUpperCase().slice(0,2):'?'}
+    function findUser(id){for(var i=0;i<allUsers.length;i++){if(allUsers[i].id===id)return allUsers[i]}return null}
+    function goBack(){window.location.href='melio-app.html'}
+    function loadTheme(){var t=localStorage.getItem('melio_theme')||'dark';document.documentElement.setAttribute('data-theme',t)}
+    function showToast(msg,type,dur){type=type||'info';dur=dur||3000;var c=document.getElementById('toastContainer');var t=document.createElement('div');t.className='toast '+type;var ic={success:'✅',error:'❌',info:'💎'};t.innerHTML='<span>'+(ic[type]||'💎')+'</span><span>'+msg+'</span>';c.appendChild(t);setTimeout(function(){t.classList.add('toast-exit');setTimeout(function(){t.remove()},300)},dur)}
+    function formatDate(iso){if(!iso)return '';return new Date(iso).toLocaleDateString('ru',{day:'numeric',month:'short',year:'numeric'})}
+    function createParticles(){var colors=['#7c3aed','#06b6d4','#a855f7','#22d3ee'];for(var i=0;i<15;i++){var p=document.createElement('div');p.className='particle';p.style.left=Math.random()*100+'vw';p.style.background=colors[Math.floor(Math.random()*colors.length)];p.style.animationDuration=(8+Math.random()*12)+'s';p.style.animationDelay=Math.random()*10+'s';var s=2+Math.random()*4;p.style.width=s+'px';p.style.height=s+'px';p.style.opacity=0.3+Math.random()*0.4;document.body.appendChild(p)}}
+
+    function getMyNfts(){
+        var ids = currentUser.nftGifts || [];
+        return allNfts.filter(function(n){return ids.indexOf(n.id)!==-1});
+    }
+
+    /* ===================== HERO ===================== */
+    function renderHero(){
+        var my = getMyNfts();
+        var counts = {common:0,rare:0,epic:0,legendary:0};
+        my.forEach(function(n){if(counts[n.rarity]!==undefined)counts[n.rarity]++});
+
+        document.getElementById('heroStats').innerHTML =
+            '<div class="nft-hero-stat"><div class="nft-hero-stat-val">' + my.length + '</div><div class="nft-hero-stat-label">Всего</div></div>' +
+            '<div class="nft-hero-stat"><div class="nft-hero-stat-val" style="color:#fbbf24">' + counts.legendary + '</div><div class="nft-hero-stat-label">Легендарных</div></div>' +
+            '<div class="nft-hero-stat"><div class="nft-hero-stat-val" style="color:var(--accent-purple-light)">' + counts.epic + '</div><div class="nft-hero-stat-label">Эпических</div></div>' +
+            '<div class="nft-hero-stat"><div class="nft-hero-stat-val" style="color:var(--accent-cyan-light)">' + counts.rare + '</div><div class="nft-hero-stat-label">Редких</div></div>';
+    }
+
+    /* ===================== TABS ===================== */
+    function switchTab(tab){
+        activeTab = tab;
+        activeFilter = 'all';
+        document.querySelectorAll('.nft-tab').forEach(function(t){t.classList.toggle('active',t.getAttribute('data-tab')===tab)});
+        document.querySelectorAll('.tab-content').forEach(function(c){c.classList.toggle('active',c.id==='tab-'+tab)});
+        updateIndicator();
+        renderActiveTab();
+    }
+
+    function updateIndicator(){
+        var activeEl=document.querySelector('.nft-tab.active');
+        var indicator=document.getElementById('tabIndicator');
+        if(!activeEl||!indicator)return;
+        var container=document.getElementById('nftTabs');
+        var cr=container.getBoundingClientRect();
+        var ar=activeEl.getBoundingClientRect();
+        indicator.style.left=(ar.left-cr.left)+'px';
+        indicator.style.width=ar.width+'px';
+    }
+
+    /* ===================== FILTERS ===================== */
+    function renderFilters(containerId){
+        var container = document.getElementById(containerId);
+        var filters = [
+            {key:'all',label:'Все',icon:'📦'},
+            {key:'legendary',label:'Легендарные',icon:'👑'},
+            {key:'epic',label:'Эпические',icon:'🔮'},
+            {key:'rare',label:'Редкие',icon:'💠'},
+            {key:'common',label:'Обычные',icon:'💿'}
+        ];
+        container.innerHTML = '';
+        filters.forEach(function(f){
+            var btn = document.createElement('button');
+            btn.className = 'filter-btn' + (activeFilter === f.key ? ' active' : '');
+            btn.innerHTML = f.icon + ' ' + f.label;
+            btn.addEventListener('click', function(){
+                activeFilter = f.key;
+                renderActiveTab();
+            });
+            container.appendChild(btn);
+        });
+    }
+
+    /* ===================== RENDER GRID ===================== */
+    function renderActiveTab(){
+        if(activeTab === 'my'){
+            renderFilters('myFilters');
+            renderMyNfts();
+        } else {
+            renderFilters('marketFilters');
+            renderMarketNfts();
+        }
+    }
+
+    function filterByRarity(nfts){
+        if(activeFilter === 'all') return nfts;
+        return nfts.filter(function(n){return n.rarity === activeFilter});
+    }
+
+    function sortByRarity(nfts){
+        return nfts.slice().sort(function(a,b){
+            return (rarityOrder[a.rarity]||3) - (rarityOrder[b.rarity]||3);
+        });
+    }
+
+    function renderMyNfts(){
+        var my = sortByRarity(filterByRarity(getMyNfts()));
+        document.getElementById('myTabCount').textContent = getMyNfts().length;
+        var grid = document.getElementById('myNftGrid');
+
+        if(!my.length){
+            grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">🎁</span><div class="empty-title">' +
+                (activeFilter==='all'?'У вас пока нет NFT':'Нет NFT этой редкости') +
+                '</div><div class="empty-desc">NFT можно получить в подарок<br>от других пользователей или администраторов</div></div>';
+            return;
+        }
+        grid.innerHTML = '';
+        my.forEach(function(nft,i){grid.appendChild(buildNftCard(nft,i))});
+    }
+
+    function renderMarketNfts(){
+        var all = sortByRarity(filterByRarity(allNfts));
+        document.getElementById('marketTabCount').textContent = allNfts.length;
+        var grid = document.getElementById('marketNftGrid');
+
+        if(!all.length){
+            grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1"><span class="empty-icon">🏪</span><div class="empty-title">Нет NFT</div><div class="empty-desc">NFT пока не созданы</div></div>';
+            return;
+        }
+        grid.innerHTML = '';
+        all.forEach(function(nft,i){grid.appendChild(buildNftCard(nft,i))});
+    }
+
+    function buildNftCard(nft,idx){
+        var div = document.createElement('div');
+        div.className = 'nft-card';
+        div.style.animationDelay = (idx * 0.06) + 's';
+
+        var owner = findUser(nft.ownerId);
+        var ownerName = owner ? owner.name : 'Без владельца';
+        var ownerAvatar = '';
+        if(owner && owner.avatar){
+            ownerAvatar = '<img src="'+owner.avatar+'" alt="">';
+        } else if(owner){
+            ownerAvatar = getInitials(owner.name);
+        } else {
+            ownerAvatar = '?';
+        }
+
+        var icon = rarityIcons[nft.rarity] || '🎁';
+        var visualContent = '';
+        if(nft.image){
+            visualContent = '<img src="'+nft.image+'" alt="">';
+        } else {
+            visualContent = '<span style="position:relative;z-index:1">' + icon + '</span>';
+        }
+
+        div.innerHTML =
+            '<div class="nft-card-visual ' + (nft.rarity||'common') + '">' +
+                '<div class="nft-rarity-tag ' + (nft.rarity||'common') + '">' + (rarityNames[nft.rarity]||'Обычный') + '</div>' +
+                visualContent +
+            '</div>' +
+            '<div class="nft-card-body">' +
+                '<div class="nft-card-name">' + nft.name + '</div>' +
+                '<div class="nft-card-desc">' + (nft.description||'Без описания') + '</div>' +
+                '<div class="nft-card-footer">' +
+                    '<div class="nft-card-owner"><div class="nft-card-owner-avatar">' + ownerAvatar + '</div> ' + ownerName + '</div>' +
+                    '<div class="nft-card-id">#' + nft.id.slice(-4) + '</div>' +
+                '</div>' +
+            '</div>';
+
+        div.addEventListener('click', function(){openNftDetail(nft.id)});
+        return div;
+    }
+
+    /* ===================== NFT DETAIL ===================== */
+    function openNftDetail(nftId){
+        selectedNftId = nftId;
+        var nft = allNfts.find(function(n){return n.id===nftId});
+        if(!nft) return;
+
+        var visual = document.getElementById('nftModalVisual');
+        visual.className = 'nft-modal-visual ' + (nft.rarity||'common');
+
+        var iconEl = document.getElementById('nftModalIcon');
+        if(nft.image){
+            iconEl.innerHTML = '<img src="'+nft.image+'" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0" alt="">';
+        } else {
+            iconEl.textContent = rarityIcons[nft.rarity] || '🎁';
+            iconEl.style.position = 'relative';
+            iconEl.style.zIndex = '1';
+        }
+
+        var rarityTag = document.getElementById('nftModalRarity');
+        rarityTag.className = 'nft-modal-rarity ' + (nft.rarity||'common');
+        rarityTag.textContent = rarityNames[nft.rarity] || 'Обычный';
+
+        document.getElementById('nftModalName').textContent = nft.name;
+        document.getElementById('nftModalDesc').textContent = nft.description || 'Без описания';
+
+        var owner = findUser(nft.ownerId);
+        var creator = findUser(nft.createdBy);
+        var isMine = currentUser.nftGifts && currentUser.nftGifts.indexOf(nft.id) !== -1;
+        var isAdmin = currentUser.role === 'admin' || currentUser.role === 'superadmin';
+
+        document.getElementById('nftDetailGrid').innerHTML =
+            '<div class="nft-detail-item"><div class="nft-detail-label">Владелец</div><div class="nft-detail-value">' + (owner?owner.name:'Нет') + '</div></div>' +
+            '<div class="nft-detail-item"><div class="nft-detail-label">Создатель</div><div class="nft-detail-value">' + (creator?creator.name:'—') + '</div></div>' +
+            '<div class="nft-detail-item"><div class="nft-detail-label">Редкость</div><div class="nft-detail-value">' + (rarityIcons[nft.rarity]||'💿') + ' ' + (rarityNames[nft.rarity]||'Обычный') + '</div></div>' +
+            '<div class="nft-detail-item"><div class="nft-detail-label">Создан</div><div class="nft-detail-value">' + formatDate(nft.createdAt) + '</div></div>';
+
+        var actionsHTML = '';
+        if(isMine){
+            actionsHTML += '<button class="nft-action-btn primary" onclick="openGiftModal()">🎁 Подарить</button>';
+        }
+        if(isAdmin && !nft.ownerId){
+            actionsHTML += '<button class="nft-action-btn primary" onclick="openGiftModal()">🎁 Назначить владельца</button>';
+        }
+        if(isAdmin){
+            actionsHTML += '<button class="nft-action-btn danger" onclick="deleteNft()">🗑 Удалить NFT</button>';
+        }
+        document.getElementById('nftModalActions').innerHTML = actionsHTML;
+
+        document.getElementById('nftDetailOverlay').classList.add('visible');
+    }
+
+    function closeNftDetail(){
+        document.getElementById('nftDetailOverlay').classList.remove('visible');
+        selectedNftId = null;
+    }
+
+    /* ===================== GIFT NFT ===================== */
+    function openGiftModal(){
+        giftingNftId = selectedNftId;
+        closeNftDetail();
+
+        var list = document.getElementById('giftUserList');
+        list.innerHTML = '';
+
+        allUsers.forEach(function(user){
+            if(user.id === currentUser.id) return;
+            var btn = document.createElement('button');
+            btn.className = 'user-select-item';
+            var avatarInner = user.avatar ? '<img src="'+user.avatar+'" alt="">' : getInitials(user.name);
+            var verHTML = user.verified ? ' <img src="https://cdn3d.iconscout.com/3d/premium/thumb/tick-3d-icon-png-download-10199917.png" class="verified-badge" alt="✓">' : '';
+
+            btn.innerHTML =
+                '<div class="us-avatar">' + avatarInner + '</div>' +
+                '<div class="us-info">' +
+                    '<div class="us-name">' + user.name + verHTML + '</div>' +
+                    '<div class="us-sub">' + (user.username?'@'+user.username:'') + ' · 💎 ' + (user.crystals||0).toLocaleString() + '</div>' +
+                '</div>';
+
+            btn.addEventListener('click', function(){giftNftTo(user.id)});
+            list.appendChild(btn);
+        });
+
+        if(!list.children.length){
+            list.innerHTML = '<div class="empty-state"><span class="empty-icon">👤</span><div class="empty-title">Нет пользователей</div></div>';
+        }
+
+        document.getElementById('giftModalOverlay').classList.add('visible');
+    }
+
+    function closeGiftModal(){
+        document.getElementById('giftModalOverlay').classList.remove('visible');
+        giftingNftId = null;
+    }
+
+    function giftNftTo(toUserId){
+        if(!giftingNftId) return;
+        var nft = allNfts.find(function(n){return n.id===giftingNftId});
+        if(!nft) return;
+
+        var toUser = findUser(toUserId);
+        var users = JSON.parse(localStorage.getItem('melio_users')||'[]');
+        var nfts = JSON.parse(localStorage.getItem('melio_nfts')||'[]');
+
+        // Remove from current owner
+        for(var i=0;i<users.length;i++){
+            if(users[i].nftGifts){
+                var idx = users[i].nftGifts.indexOf(giftingNftId);
+                if(idx!==-1) users[i].nftGifts.splice(idx,1);
+            }
+        }
+
+        // Add to new owner
+        for(var j=0;j<users.length;j++){
+            if(users[j].id===toUserId){
+                if(!users[j].nftGifts) users[j].nftGifts = [];
+                users[j].nftGifts.push(giftingNftId);
+                break;
+            }
+        }
+
+        // Update nft owner
+        for(var k=0;k<nfts.length;k++){
+            if(nfts[k].id===giftingNftId){
+                nfts[k].ownerId = toUserId;
+                break;
+            }
+        }
+
+        localStorage.setItem('melio_users',JSON.stringify(users));
+        localStorage.setItem('melio_nfts',JSON.stringify(nfts));
+
+        // Refresh state
+        allUsers = users;
+        allNfts = nfts;
+        currentUser = users.find(function(u){return u.id===currentUser.id});
+
+        closeGiftModal();
+        showToast('NFT «' + nft.name + '» подарен ' + (toUser?toUser.name:'пользователю') + '! 🎁','success');
+        renderAll();
+    }
+
+    /* ===================== DELETE NFT ===================== */
+    function deleteNft(){
+        if(!selectedNftId) return;
+        var nft = allNfts.find(function(n){return n.id===selectedNftId});
+        if(!nft) return;
+
+        if(!confirm('Удалить NFT «' + nft.name + '» навсегда?')) return;
+
+        var nfts = JSON.parse(localStorage.getItem('melio_nfts')||'[]');
+        nfts = nfts.filter(function(n){return n.id!==selectedNftId});
+        localStorage.setItem('melio_nfts',JSON.stringify(nfts));
+
+        // Remove from users
+        var users = JSON.parse(localStorage.getItem('melio_users')||'[]');
+        users.forEach(function(u){
+            if(u.nftGifts){
+                var idx = u.nftGifts.indexOf(selectedNftId);
+                if(idx!==-1) u.nftGifts.splice(idx,1);
+            }
+        });
+        localStorage.setItem('melio_users',JSON.stringify(users));
+
+        allUsers = users;
+        allNfts = nfts;
+        currentUser = users.find(function(u){return u.id===currentUser.id});
+
+        closeNftDetail();
+        showToast('NFT удалён','info');
+        renderAll();
+    }
+
+    /* ===================== RENDER ALL ===================== */
+    function renderAll(){
+        renderHero();
+        renderActiveTab();
+    }
+
+    /* ===================== INIT ===================== */
+    document.addEventListener('DOMContentLoaded', function(){
+        loadTheme();
+        createParticles();
+
+        var session = JSON.parse(localStorage.getItem('melio_session')||'{}');
+        if(!session.loggedIn){window.location.href='melio-auth.html';return}
+
+        allUsers = JSON.parse(localStorage.getItem('melio_users')||'[]');
+        allNfts = JSON.parse(localStorage.getItem('melio_nfts')||'[]');
+        currentUser = allUsers.find(function(u){return u.id===session.userId});
+        if(!currentUser){window.location.href='melio-auth.html';return}
+
+        renderAll();
+        setTimeout(updateIndicator, 50);
+        window.addEventListener('resize', updateIndicator);
+
+        document.getElementById('nftDetailOverlay').addEventListener('click',function(e){if(e.target.id==='nftDetailOverlay')closeNftDetail()});
+        document.getElementById('giftModalOverlay').addEventListener('click',function(e){if(e.target.id==='giftModalOverlay')closeGiftModal()});
+
+        document.addEventListener('keydown',function(e){
+            if(e.key==='Escape'){closeNftDetail();closeGiftModal()}
+        });
+    });
+</script>
+</body>
+</html>
