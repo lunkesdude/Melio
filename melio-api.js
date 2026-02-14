@@ -2,7 +2,7 @@
 // MELIO API — Подключение к серверу
 // ============================================
 
-const SERVER_URL = 'https://ТВОЯ_ССЫЛКА.onrender.com'; // ← Замени на свою!
+const SERVER_URL = 'https://melio-backend.vercel.app';
 
 // Socket.io подключение
 let socket = null;
@@ -13,13 +13,11 @@ let currentUser = null;
 // ============================================
 
 function initMelioAPI() {
-    // Подключаемся к серверу
     socket = io(SERVER_URL);
     
     socket.on('connect', () => {
         console.log('✅ Melio: Подключились к серверу!');
         
-        // Авторизуемся если есть сессия
         const session = JSON.parse(localStorage.getItem('melio_session') || '{}');
         if (session.userId) {
             socket.emit('auth', session.userId);
@@ -32,7 +30,7 @@ function initMelioAPI() {
     });
     
     socket.on('connect_error', (err) => {
-        console.log('⚠️ Melio: Ошибка подключения:', err.message);
+        console.error('⚠️ Melio: Ошибка подключения:', err.message);
     });
     
     return socket;
@@ -56,7 +54,6 @@ const MelioAuth = {
             throw new Error(data.error || 'Ошибка регистрации');
         }
         
-        // Сохраняем сессию
         localStorage.setItem('melio_session', JSON.stringify({
             userId: data.user.id,
             loggedIn: true
@@ -64,7 +61,6 @@ const MelioAuth = {
         
         currentUser = data.user.id;
         
-        // Авторизуемся через сокет
         if (socket && socket.connected) {
             socket.emit('auth', data.user.id);
         }
@@ -100,4 +96,97 @@ const MelioAuth = {
     },
     
     logout() {
+        localStorage.removeItem('melio_session');
+        currentUser = null;
+        if (socket) {
+            socket.disconnect();
+        }
+    },
+    
+    getSession() {
+        return JSON.parse(localStorage.getItem('melio_session') || '{}');
+    },
+    
+    isLoggedIn() {
+        const session = this.getSession();
+        return session.loggedIn === true;
+    }
+};
+
+// ============================================
+// СООБЩЕНИЯ
+// ============================================
+
+const MelioChat = {
+    send(text, chatId = 'main') {
+        if (!socket || !socket.connected) {
+            console.error('❌ Нет подключения к серверу');
+            return false;
+        }
         
+        socket.emit('send_message', { chatId, text });
+        return true;
+    },
+    
+    typing(chatId = 'main') {
+        if (socket && socket.connected) {
+            socket.emit('typing', { chatId });
+        }
+    },
+    
+    onMessage(callback) {
+        if (socket) {
+            socket.on('new_message', callback);
+        }
+    },
+    
+    onHistory(callback) {
+        if (socket) {
+            socket.on('messages_history', callback);
+        }
+    },
+    
+    onTyping(callback) {
+        if (socket) {
+            socket.on('user_typing', callback);
+        }
+    }
+};
+
+// ============================================
+// ПОЛЬЗОВАТЕЛИ
+// ============================================
+
+const MelioUsers = {
+    async getAll() {
+        const response = await fetch(`${SERVER_URL}/api/users`);
+        return await response.json();
+    },
+    
+    onUserOnline(callback) {
+        if (socket) {
+            socket.on('user_online', callback);
+        }
+    },
+    
+    onUserOffline(callback) {
+        if (socket) {
+            socket.on('user_offline', callback);
+        }
+    }
+};
+
+// ============================================
+// ЭКСПОРТ
+// ============================================
+
+const Melio = {
+    init: initMelioAPI,
+    auth: MelioAuth,
+    chat: MelioChat,
+    users: MelioUsers,
+    getSocket: () => socket,
+    getCurrentUser: () => currentUser
+};
+
+console.log('💎 Melio API загружен');
