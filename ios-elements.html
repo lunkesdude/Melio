@@ -1,0 +1,185 @@
+<!-- 📱 РАМКА iPHONE -->
+<div style="width:393px;height:852px;background:#000;border-radius:55px;padding:12px;box-shadow:0 0 0 2px #1a1a1a,0 0 0 4px #333,0 50px 100px rgba(0,0,0,0.5);position:relative;">
+    <div style="width:100%;height:100%;background:#F2F2F7;border-radius:44px;overflow:hidden;position:relative;">
+        <div style="position:absolute;top:11px;left:50%;transform:translateX(-50%);width:126px;height:37px;background:#000;border-radius:22px;z-index:100;"></div>
+        <div style="display:flex;justify-content:space-between;padding:12px 24px 0;height:54px;font-size:15px;font-weight:600;font-family:-apple-system,sans-serif;"><span>9:41</span><span>📶📡🔋</span></div>
+        <div style="padding:20px;height:calc(100% - 88px);overflow-y:auto;"><!-- КОНТЕНТ --></div>
+        <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;background:#000;border-radius:100px;opacity:0.2;"></div>
+    </div>
+</div>
+
+<!-- 🔘 КНОПКИ -->
+<button style="padding:14px 20px;border-radius:12px;font-size:17px;font-weight:600;border:none;background:#007AFF;color:white;cursor:pointer;">Primary</button>
+<button style="padding:14px 20px;border-radius:12px;font-size:17px;font-weight:600;border:none;background:rgba(0,122,255,0.15);color:#007AFF;cursor:pointer;">Secondary</button>
+<button style="padding:14px 20px;border-radius:12px;font-size:17px;font-weight:600;border:none;background:#FF3B30;color:white;cursor:pointer;">Destructive</button>
+<button style="padding:14px 20px;border-radius:12px;font-size:17px;font-weight:600;border:none;background:rgba(120,120,128,0.2);color:#000;cursor:pointer;">Gray</button>
+<button style="padding:14px 20px;border-radius:12px;font-size:17px;font-weight:600;border:1.5px solid #007AFF;background:transparent;color:#007AFF;cursor:pointer;">Outline</button>
+<button style="padding:14px 20px;border-radius:100px;font-size:17px;font-weight:600;border:none;background:#007AFF;color:white;cursor:pointer;">Pill</button>
+<button style="width:44px;height:44px;border-radius:22px;font-size:20px;border:none;background:#007AFF;color:white;cursor:pointer;">+</button>
+
+<!-- 🔀 TOGGLE SWITCH -->
+<label style="width:51px;height:31px;display:block;position:relative;cursor:pointer;">
+    <input type="checkbox" style="display:none;" onchange="this.nextElementSibling.style.background=this.checked?'#34C759':'rgba(120,120,128,0.2)';this.nextElementSibling.children[0].style.transform=this.checked?'translateX(20px)':'translateX(0)'">
+    <span style="position:absolute;inset:0;background:rgba(120,120,128,0.2);border-radius:31px;transition:0.3s;"><span style="position:absolute;width:27px;height:27px;background:white;border-radius:50%;top:2px;left:2px;transition:0.3s;box-shadow:0 3px 8px rgba(0,0,0,0.15);"></span></span>
+</label>
+
+<!-- 📊 SEGMENTED CONTROL -->
+<div style="display:flex;background:rgba(120,120,128,0.12);border-radius:9px;padding:2px;width:300px;" id="seg1">
+    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.style.background='transparent';b.style.boxShadow='none'});this.style.background='white';this.style.boxShadow='0 3px 8px rgba(0,0,0,0.12)'" style="flex:1;padding:6px 12px;font-size:13px;font-weight:600;border:none;background:white;border-radius:7px;box-shadow:0 3px 8px rgba(0,0,0,0.12);cursor:pointer;">Первый</button>
+    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.style.background='transparent';b.style.boxShadow='none'});this.style.background='white';this.style.boxShadow='0 3px 8px rgba(0,0,0,0.12)'" style="flex:1;padding:6px 12px;font-size:13px;font-weight:600;border:none;background:transparent;border-radius:7px;cursor:pointer;">Второй</button>
+    <button onclick="this.parentElement.querySelectorAll('button').forEach(b=>{b.style.background='transparent';b.style.boxShadow='none'});this.style.background='white';this.style.boxShadow='0 3px 8px rgba(0,0,0,0.12)'" style="flex:1;padding:6px 12px;font-size:13px;font-weight:600;border:none;background:transparent;border-radius:7px;cursor:pointer;">Третий</button>
+</div>
+
+<!-- 🎚️ SLIDER -->
+<style>input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:28px;height:28px;background:white;border-radius:50%;box-shadow:0 3px 8px rgba(0,0,0,0.15);cursor:pointer;}</style>
+<div style="display:flex;align-items:center;gap:12px;width:300px;">
+    <span>🔅</span>
+    <input type="range" value="50" style="flex:1;height:4px;-webkit-appearance:none;background:linear-gradient(to right,#007AFF 50%,rgba(120,120,128,0.2) 50%);border-radius:2px;outline:none;" oninput="this.style.background='linear-gradient(to right,#007AFF '+this.value+'%,rgba(120,120,128,0.2) '+this.value+'%)'">
+    <span>🔆</span>
+</div>
+
+<!-- ➕➖ STEPPER -->
+<div style="display:flex;align-items:center;gap:16px;">
+    <div style="display:flex;background:rgba(120,120,128,0.12);border-radius:8px;overflow:hidden;">
+        <button onclick="let v=document.getElementById('sVal');v.textContent=Math.max(0,+v.textContent-1)" style="width:47px;height:32px;border:none;background:none;font-size:23px;color:#007AFF;cursor:pointer;">−</button>
+        <div style="width:0.5px;background:rgba(60,60,67,0.29);margin:8px 0;"></div>
+        <button onclick="let v=document.getElementById('sVal');v.textContent=+v.textContent+1" style="width:47px;height:32px;border:none;background:none;font-size:23px;color:#007AFF;cursor:pointer;">+</button>
+    </div>
+    <span id="sVal" style="font-size:17px;font-weight:500;">1</span>
+</div>
+
+<!-- 📝 TEXT INPUT -->
+<input type="text" placeholder="Введите текст" style="width:300px;padding:12px 16px;font-size:17px;border:none;background:white;border-radius:10px;outline:none;font-family:-apple-system,sans-serif;" onfocus="this.style.boxShadow='0 0 0 3px rgba(0,122,255,0.3)'" onblur="this.style.boxShadow='none'">
+
+<!-- 📝 INPUT GROUP -->
+<div style="background:white;border-radius:10px;overflow:hidden;width:300px;">
+    <input type="text" placeholder="Имя" style="width:100%;padding:12px 16px;font-size:17px;border:none;border-bottom:0.5px solid rgba(60,60,67,0.29);outline:none;">
+    <input type="email" placeholder="Email" style="width:100%;padding:12px 16px;font-size:17px;border:none;border-bottom:0.5px solid rgba(60,60,67,0.29);outline:none;">
+    <input type="password" placeholder="Пароль" style="width:100%;padding:12px 16px;font-size:17px;border:none;outline:none;">
+</div>
+
+<!-- 🔍 SEARCH BAR -->
+<div style="display:flex;align-items:center;background:rgba(118,118,128,0.12);border-radius:10px;padding:8px 12px;gap:8px;width:350px;">
+    <span style="opacity:0.6;">🔍</span>
+    <input type="text" placeholder="Поиск" style="flex:1;border:none;background:none;font-size:17px;outline:none;">
+    <span style="opacity:0.6;cursor:pointer;">🎤</span>
+</div>
+
+<!-- 📋 LIST CELL -->
+<div style="display:flex;align-items:center;min-height:44px;padding:11px 16px;background:white;border-radius:10px;cursor:pointer;width:350px;" onclick="this.style.background='rgba(120,120,128,0.12)';setTimeout(()=>this.style.background='white',150)">
+    <div style="width:29px;height:29px;border-radius:6px;background:#007AFF;display:flex;align-items:center;justify-content:center;margin-right:15px;">📶</div>
+    <span style="flex:1;font-size:17px;">Wi-Fi</span>
+    <span style="font-size:17px;color:rgba(60,60,67,0.6);margin-right:8px;">Дом</span>
+    <span style="color:rgba(60,60,67,0.3);font-size:20px;">›</span>
+</div>
+
+<!-- 📋 CELL WITH TOGGLE -->
+<div style="display:flex;align-items:center;min-height:44px;padding:11px 16px;background:white;border-radius:10px;width:350px;">
+    <div style="width:29px;height:29px;border-radius:6px;background:#FF9500;display:flex;align-items:center;justify-content:center;margin-right:15px;">✈️</div>
+    <span style="flex:1;font-size:17px;">Авиарежим</span>
+    <label style="width:51px;height:31px;display:block;position:relative;cursor:pointer;"><input type="checkbox" style="display:none;" onchange="this.nextElementSibling.style.background=this.checked?'#34C759':'rgba(120,120,128,0.2)';this.nextElementSibling.children[0].style.transform=this.checked?'translateX(20px)':'translateX(0)'"><span style="position:absolute;inset:0;background:rgba(120,120,128,0.2);border-radius:31px;transition:0.3s;"><span style="position:absolute;width:27px;height:27px;background:white;border-radius:50%;top:2px;left:2px;transition:0.3s;box-shadow:0 3px 8px rgba(0,0,0,0.15);"></span></span></label>
+</div>
+
+<!-- 🔴 BADGES -->
+<span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#FF3B30;color:white;font-size:13px;font-weight:500;">1</span>
+<span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#007AFF;color:white;font-size:13px;font-weight:500;">5</span>
+<span style="display:inline-flex;align-items:center;justify-content:center;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:#34C759;color:white;font-size:13px;font-weight:500;">99+</span>
+
+<!-- ✅ CHECKBOX -->
+<div onclick="this.classList.toggle('chk');this.style.background=this.classList.contains('chk')?'#007AFF':'transparent';this.style.borderColor=this.classList.contains('chk')?'#007AFF':'rgba(120,120,128,0.2)';this.innerHTML=this.classList.contains('chk')?'<span style=\"color:white;font-weight:700;\">✓</span>':''" style="width:22px;height:22px;border-radius:50%;border:2px solid rgba(120,120,128,0.2);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:0.2s;"></div>
+
+<!-- 🔘 RADIO -->
+<div onclick="document.querySelectorAll('.rad').forEach(r=>{r.innerHTML='';r.style.background='transparent'});this.innerHTML='<div style=\"width:12px;height:12px;background:#007AFF;border-radius:50%;\"></div>'" class="rad" style="width:22px;height:22px;border-radius:50%;border:2px solid #007AFF;display:flex;align-items:center;justify-content:center;cursor:pointer;"></div>
+
+<!-- ⏳ SPINNER -->
+<style>@keyframes spin{to{transform:rotate(360deg)}}</style>
+<div style="width:20px;height:20px;border:2.5px solid rgba(120,120,128,0.2);border-top-color:#8E8E93;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+<div style="width:37px;height:37px;border:3.5px solid rgba(120,120,128,0.2);border-top-color:#8E8E93;border-radius:50%;animation:spin 0.8s linear infinite;"></div>
+
+<!-- 📊 PROGRESS RING -->
+<div style="width:60px;height:60px;position:relative;">
+    <svg width="60" height="60" style="transform:rotate(-90deg);"><circle cx="30" cy="30" r="25" fill="none" stroke="rgba(120,120,128,0.2)" stroke-width="6"/><circle cx="30" cy="30" r="25" fill="none" stroke="#007AFF" stroke-width="6" stroke-linecap="round" stroke-dasharray="157" stroke-dashoffset="40"/></svg>
+    <span style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:14px;font-weight:600;">75%</span>
+</div>
+
+<!-- 🏃 ACTIVITY RINGS -->
+<div style="width:100px;height:100px;position:relative;">
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:90px;height:90px;border-radius:50%;border:8px solid rgba(255,45,85,0.3);border-top-color:#FF2D55;border-right-color:#FF2D55;"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;border:8px solid rgba(52,199,89,0.3);border-top-color:#34C759;"></div>
+    <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:50px;height:50px;border-radius:50%;border:8px solid rgba(90,200,250,0.3);border-top-color:#5AC8FA;border-right-color:#5AC8FA;border-bottom-color:#5AC8FA;"></div>
+</div>
+
+<!-- 🔔 ALERT -->
+<div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(40px);border-radius:14px;width:270px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.15);">
+    <div style="padding:19px 16px;text-align:center;">
+        <div style="font-size:17px;font-weight:600;margin-bottom:4px;">Заголовок</div>
+        <div style="font-size:13px;">Текст сообщения.</div>
+    </div>
+    <div style="display:flex;border-top:0.5px solid rgba(60,60,67,0.29);">
+        <button style="flex:1;padding:11px;font-size:17px;color:#007AFF;background:none;border:none;border-right:0.5px solid rgba(60,60,67,0.29);cursor:pointer;">Отмена</button>
+        <button style="flex:1;padding:11px;font-size:17px;color:#007AFF;font-weight:600;background:none;border:none;cursor:pointer;">OK</button>
+    </div>
+</div>
+
+<!-- 📄 ACTION SHEET -->
+<div style="width:350px;">
+    <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(40px);border-radius:14px;overflow:hidden;margin-bottom:8px;">
+        <div style="padding:14px 16px;text-align:center;border-bottom:0.5px solid rgba(60,60,67,0.29);"><div style="font-size:13px;font-weight:600;color:rgba(60,60,67,0.6);">Выберите действие</div></div>
+        <button style="width:100%;padding:18px;font-size:20px;color:#007AFF;background:none;border:none;border-bottom:0.5px solid rgba(60,60,67,0.29);cursor:pointer;">📷 Сделать фото</button>
+        <button style="width:100%;padding:18px;font-size:20px;color:#007AFF;background:none;border:none;border-bottom:0.5px solid rgba(60,60,67,0.29);cursor:pointer;">🖼️ Галерея</button>
+        <button style="width:100%;padding:18px;font-size:20px;color:#FF3B30;background:none;border:none;cursor:pointer;">🗑️ Удалить</button>
+    </div>
+    <div style="background:rgba(255,255,255,0.95);backdrop-filter:blur(40px);border-radius:14px;overflow:hidden;">
+        <button style="width:100%;padding:18px;font-size:20px;color:#007AFF;font-weight:600;background:none;border:none;cursor:pointer;">Отмена</button>
+    </div>
+</div>
+
+<!-- 📱 TAB BAR -->
+<div style="display:flex;background:rgba(249,249,249,0.94);backdrop-filter:blur(20px);border-top:0.5px solid rgba(60,60,67,0.29);padding:6px 0 20px;width:100%;max-width:400px;">
+    <button onclick="this.parentElement.querySelectorAll('.tl').forEach(l=>l.style.color='rgba(60,60,67,0.6)');this.querySelector('.tl').style.color='#007AFF'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;"><span style="font-size:24px;">🏠</span><span class="tl" style="font-size:10px;color:#007AFF;">Главная</span></button>
+    <button onclick="this.parentElement.querySelectorAll('.tl').forEach(l=>l.style.color='rgba(60,60,67,0.6)');this.querySelector('.tl').style.color='#007AFF'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;"><span style="font-size:24px;">🔍</span><span class="tl" style="font-size:10px;color:rgba(60,60,67,0.6);">Поиск</span></button>
+    <button onclick="this.parentElement.querySelectorAll('.tl').forEach(l=>l.style.color='rgba(60,60,67,0.6)');this.querySelector('.tl').style.color='#007AFF'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;"><span style="font-size:24px;">❤️</span><span class="tl" style="font-size:10px;color:rgba(60,60,67,0.6);">Избранное</span></button>
+    <button onclick="this.parentElement.querySelectorAll('.tl').forEach(l=>l.style.color='rgba(60,60,67,0.6)');this.querySelector('.tl').style.color='#007AFF'" style="flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:none;cursor:pointer;"><span style="font-size:24px;">⚙️</span><span class="tl" style="font-size:10px;color:rgba(60,60,67,0.6);">Настройки</span></button>
+</div>
+
+<!-- 🧭 NAV BAR -->
+<div style="display:flex;align-items:center;justify-content:space-between;height:44px;padding:0 16px;background:rgba(249,249,249,0.94);backdrop-filter:blur(20px);border-bottom:0.5px solid rgba(60,60,67,0.29);width:100%;max-width:400px;position:relative;">
+    <button style="color:#007AFF;font-size:17px;background:none;border:none;cursor:pointer;">← Назад</button>
+    <span style="font-size:17px;font-weight:600;position:absolute;left:50%;transform:translateX(-50%);">Заголовок</span>
+    <button style="color:#007AFF;font-size:17px;background:none;border:none;cursor:pointer;">Готово</button>
+</div>
+
+<!-- 🎛️ CONTROL TILE -->
+<div onclick="this.classList.toggle('on');this.style.background=this.classList.contains('on')?'#007AFF':'white';this.querySelectorAll('span').forEach(s=>s.style.color=this.classList.contains('on')?'white':'')" style="width:110px;height:110px;background:white;border-radius:18px;padding:14px;display:flex;flex-direction:column;cursor:pointer;">
+    <span style="font-size:24px;color:#007AFF;margin-bottom:auto;">📶</span>
+    <span style="font-size:12px;font-weight:600;">Wi-Fi</span>
+    <span style="font-size:11px;color:rgba(60,60,67,0.6);">Дом</span>
+</div>
+
+<!-- 🔔 NOTIFICATION -->
+<div style="display:flex;align-items:flex-start;gap:12px;background:rgba(255,255,255,0.95);backdrop-filter:blur(40px);border-radius:20px;padding:14px 16px;box-shadow:0 10px 40px rgba(0,0,0,0.15);max-width:380px;">
+    <div style="width:44px;height:44px;border-radius:10px;background:linear-gradient(135deg,#5AC8FA,#007AFF);display:flex;align-items:center;justify-content:center;font-size:22px;">💬</div>
+    <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:rgba(60,60,67,0.6);text-transform:uppercase;">Сообщения</div><div style="font-size:15px;font-weight:600;">Мама</div><div style="font-size:15px;color:rgba(60,60,67,0.6);">Привет! Как дела? 😊</div></div>
+    <div style="font-size:13px;color:rgba(60,60,67,0.6);">сейчас</div>
+</div>
+
+<!-- 📝 CONTEXT MENU -->
+<div style="background:rgba(255,255,255,0.9);backdrop-filter:blur(40px);border-radius:14px;min-width:250px;overflow:hidden;box-shadow:0 10px 40px rgba(0,0,0,0.2);">
+    <div style="display:flex;justify-content:space-between;padding:12px 16px;font-size:17px;cursor:pointer;border-bottom:0.5px solid rgba(60,60,67,0.29);">Копировать<span>📋</span></div>
+    <div style="display:flex;justify-content:space-between;padding:12px 16px;font-size:17px;cursor:pointer;border-bottom:0.5px solid rgba(60,60,67,0.29);">Поделиться<span>📤</span></div>
+    <div style="display:flex;justify-content:space-between;padding:12px 16px;font-size:17px;cursor:pointer;border-bottom:0.5px solid rgba(60,60,67,0.29);">Избранное<span>⭐</span></div>
+    <div style="display:flex;justify-content:space-between;padding:12px 16px;font-size:17px;cursor:pointer;color:#FF3B30;">Удалить<span>🗑️</span></div>
+</div>
+
+<!-- 🎨 COLORS -->
+<div style="display:flex;gap:12px;flex-wrap:wrap;">
+    <div style="width:44px;height:44px;border-radius:50%;background:#007AFF;cursor:pointer;"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:#34C759;cursor:pointer;"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:#FF3B30;cursor:pointer;"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:#FF9500;cursor:pointer;"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:#FFCC00;cursor:pointer;"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:#AF52DE;cursor:pointer;"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:#FF2D55;cursor:pointer;"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:#5AC8FA;cursor:pointer;"></div>
+    <div style="width:44px;height:44px;border-radius:50%;background:#5856D6;cursor:pointer;"></div>
+</div>

@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Melio</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2563eb;
+            --bg: #ffffff;
+            --text: #05060f;
+            --input-bg: #05060f0a;
+            --border: #05060f33;
+        }
+
+        body.dark {
+            --primary: #3b82f6;
+            --bg: #0f172a;
+            --text: #f1f5f9;
+            --input-bg: rgba(255, 255, 255, 0.05);
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg);
+            color: var(--text);
+            padding: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.01, 0.25, 1);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 420px;
+            animation: fadeIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .logo {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            object-fit: contain;
+        }
+
+        .title {
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 15px;
+            color: #05060f99;
+        }
+
+        body.dark .subtitle {
+            color: rgba(241, 245, 249, 0.6);
+        }
+
+        /* Theme Toggle */
+        .theme-toggle-wrapper {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+        }
+
+.checkbox {
+  display: none;
+}
+
+.slider {
+  width: 60px;
+  height: 30px;
+  background-color: lightgray;
+  border-radius: 20px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  border: 4px solid transparent;
+  transition: .3s;
+  box-shadow: 0 0 10px 0 rgb(0, 0, 0, 0.25) inset;
+  cursor: pointer;
+}
+
+.slider::before {
+  content: '';
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: #fff;
+  transform: translateX(-30px);
+  border-radius: 20px;
+  transition: .3s;
+  box-shadow: 0 0 10px 3px rgb(0, 0, 0, 0.25);
+}
+
+.checkbox:checked ~ .slider::before {
+  transform: translateX(30px);
+  box-shadow: 0 0 10px 3px rgb(0, 0, 0, 0.25);
+}
+
+.checkbox:checked ~ .slider {
+  background-color: #2196F3;
+}
+
+.checkbox:active ~ .slider::before {
+  transform: translate(0);
+}
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            border: 2px solid var(--border);
+            background: transparent;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #05060f99;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.01, 0.25, 1);
+        }
+
+        body.dark .tab {
+            color: rgba(241, 245, 249, 0.6);
+        }
+
+        .tab.active {
+            border-color: var(--primary);
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Forms */
+        .form {
+            display: none;
+        }
+
+        .form.active {
+            display: block;
+            animation: fadeIn 0.4s ease;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            font-weight: bold;
+            color: #05060f99;
+            transition: color .3s cubic-bezier(.25,.01,.25,1);
+        }
+
+        body.dark .label {
+            color: rgba(241, 245, 249, 0.7);
+        }
+
+        .input {
+            width: 100%;
+            height: 48px;
+            background-color: var(--input-bg);
+            border-radius: 8px;
+            padding: 0 16px;
+            border: 2px solid transparent;
+            font-size: 15px;
+            transition: border-color .3s cubic-bezier(.25,.01,.25,1), background .2s cubic-bezier(.25,.01,.25,1);
+            color: var(--text);
+            font-family: inherit;
+        }
+
+        .input:hover, .input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .input-group:hover .label {
+            color: var(--primary);
+        }
+
+        .input::placeholder {
+            color: #05060f66;
+        }
+
+        body.dark .input::placeholder {
+            color: rgba(241, 245, 249, 0.4);
+        }
+
+        /* Password Strength */
+        .password-strength {
+            margin-top: 8px;
+            display: none;
+        }
+
+        .password-strength.show {
+            display: block;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0;
+            background: var(--primary);
+            transition: all 0.3s;
+        }
+
+        .strength-text {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        /* Animated Button */
+        .animated-button {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+            width: 100%;
+            padding: 16px 36px;
+            border: 4px solid transparent;
+            font-size: 16px;
+            background-color: inherit;
+            border-radius: 100px;
+            font-weight: 600;
+            color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary);
+            cursor: pointer;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            margin-bottom: 16px;
+        }
+
+        .animated-button svg {
+            position: absolute;
+            width: 24px;
+            fill: var(--primary);
+            z-index: 9;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .animated-button .arr-1 {
+            right: 16px;
+        }
+
+        .animated-button .arr-2 {
+            left: -25%;
+        }
+
+        .animated-button .circle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            background-color: var(--primary);
+            border-radius: 50%;
+            opacity: 0;
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .animated-button .text {
+            position: relative;
+            z-index: 1;
+            transform: translateX(-12px);
+            transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+        }
+
+        .animated-button:hover {
+            box-shadow: 0 0 0 12px transparent;
+            color: white;
+            border-radius: 12px;
+        }
+
+        body.dark .animated-button:hover {
+            color: #0f172a;
+        }
+
+        .animated-button:hover .arr-1 {
+            right: -25%;
+        }
+
+        .animated-button:hover .arr-2 {
+            left: 16px;
+        }
+
+        .animated-button:hover .text {
+            transform: translateX(12px);
+        }
+
+        .animated-button:hover svg {
+            fill: white;
+        }
+
+        body.dark .animated-button:hover svg {
+            fill: #0f172a;
+        }
+
+        .animated-button:active {
+            scale: 0.95;
+            box-shadow: 0 0 0 4px var(--primary);
+        }
+
+        .animated-button:hover .circle {
+            width: 500px;
+            height: 500px;
+            opacity: 1;
+        }
+
+        /* Simple Button */
+.simple-button {
+    cursor: pointer;
+    font-weight: 700;
+    transition: all 0.2s;
+    padding: 14px 24px;
+    border-radius: 100px;
+    background: white;
+    border: 2px solid var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 15px;
+    width: 100%;
+    color: var(--text);
+}
+
+body.dark .simple-button {
+    background: var(--bg);
+    border-color: var(--primary);
+}
+
+.simple-button:hover {
+    background: var(--primary);
+    color: white;
+    transform: translateY(-2px);
+}
+
+.simple-button svg {
+    width: 20px;
+    height: 20px;
+}
+
+.simple-button:active {
+    transform: scale(0.95);
+}
+
+        .divider {
+            text-align: center;
+            margin: 24px 0;
+            color: #05060f66;
+            font-size: 13px;
+            position: relative;
+        }
+
+        .divider::before,
+        .divider::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 42%;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider::before { left: 0; }
+        .divider::after { right: 0; }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            max-width: 400px;
+            display: none;
+            z-index: 9999;
+            animation: slideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(100px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .notification.show {
+            display: block;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-left: 4px solid;
+            transition: all 0.3s ease-in-out;
+        }
+
+        .alert:hover {
+            transform: scale(1.02);
+        }
+
+        .alert-success {
+            background: #dbeafe;
+            border-color: var(--primary);
+            color: #1e3a8a;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            border-color: #ef4444;
+            color: #991b1b;
+        }
+
+        body.dark .alert-success {
+            background: #1e3a8a;
+            color: #dbeafe;
+        }
+
+        body.dark .alert-error {
+            background: #7f1d1d;
+            color: #fee2e2;
+        }
+
+        .alert svg {
+            width: 20px;
+            height: 20px;
+            flex-shrink: 0;
+        }
+
+        .alert-text {
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        @media (max-width: 600px) {
+            .notification {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body class="light">
+
+    <!-- Theme Toggle -->
+    <div class="theme-toggle-wrapper">
+        <input type="checkbox" class="checkbox" id="themeToggle">
+        <label class="slider" for="themeToggle"></label>
+    </div>
+
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <img src="assets/IMG_2057.PNG" alt="Melio" class="logo" id="logo">
+            <h1 class="title">Melio</h1>
+            <p class="subtitle">Современный мессенджер</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" data-tab="login">Вход</button>
+            <button class="tab" data-tab="register">Регистрация</button>
+        </div>
+
+        <!-- Login Form -->
+        <form class="form active" id="loginForm">
+            <div class="input-group">
+                <label class="label">Email</label>
+                <input type="email" class="input" placeholder="your@email.com" id="loginEmail" autocomplete="email" required>
+            </div>
+
+            <div class="input-group">
+                <label class="label">Пароль</label>
+                <input type="password" class="input" placeholder="••••••••" id="loginPassword" autocomplete="current-password" required>
+            </div>
+
+            <button type="submit" class="animated-button">
+                <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                </svg>
+                <span class="text">Войти</span>
+                <span class="circle"></span>
+                <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                </svg>
+            </button>
+
+            <div class="divider">или</div>
+
+            <button type="button" class="simple-button" id="loginGoogle">
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Google
+            </button>
+        </form>
+
+        <!-- Register Form -->
+        <form class="form" id="registerForm">
+            <div class="input-group">
+                <label class="label">Имя</label>
+                <input type="text" class="input" placeholder="Ваше имя" id="registerName" autocomplete="name" required>
+            </div>
+
+            <div class="input-group">
+                <label class="label">Email</label>
+                <input type="email" class="input" placeholder="your@email.com" id="registerEmail" autocomplete="email" required>
+            </div>
+
+            <div class="input-group">
+                <label class="label">Пароль</label>
+                <input type="password" class="input" placeholder="••••••••" id="registerPassword" autocomplete="new-password" required>
+                <div class="password-strength" id="passwordStrength">
+                    <div class="strength-bar">
+                        <div class="strength-fill" id="strengthFill"></div>
+                    </div>
+                    <div class="strength-text" id="strengthText"></div>
+                </div>
+            </div>
+
+            <div class="input-group">
+                <label class="label">Повторите пароль</label>
+                <input type="password" class="input" placeholder="••••••••" id="registerPasswordConfirm" autocomplete="new-password" required>
+            </div>
+
+            <button type="submit" class="animated-button">
+                <svg viewBox="0 0 24 24" class="arr-2" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                </svg>
+                <span class="text">Регистрация</span>
+                <span class="circle"></span>
+                <svg viewBox="0 0 24 24" class="arr-1" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M16.1716 10.9999L10.8076 5.63589L12.2218 4.22168L20 11.9999L12.2218 19.778L10.8076 18.3638L16.1716 12.9999H4V10.9999H16.1716Z"></path>
+                </svg>
+            </button>
+
+            <div class="divider">или</div>
+
+            <button type="button" class="simple-button" id="registerGoogle">
+                <svg viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+                Google
+            </button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, updateProfile } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDlh3S7XpePBlbEnZLLE39GTZhb7M03X3I",
+            authDomain: "melio-43f6a.firebaseapp.com",
+            projectId: "melio-43f6a",
+            storageBucket: "melio-43f6a.firebasestorage.app",
+            messagingSenderId: "369209638644",
+            appId: "1:369209638644:web:0c63b721abf1b6b49868a1",
+            measurementId: "G-2B0PZPC8GS"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        // Theme
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        const logo = document.getElementById('logo');
+
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.className = savedTheme;
+        themeToggle.checked = savedTheme === 'dark';
+        logo.src = savedTheme === 'dark' ? 'assets/IMG_2056.PNG' : 'assets/IMG_2057.PNG';
+
+        themeToggle.addEventListener('change', () => {
+            const newTheme = themeToggle.checked ? 'dark' : 'light';
+            body.className = newTheme;
+            localStorage.setItem('theme', newTheme);
+            logo.src = newTheme === 'dark' ? 'assets/IMG_2056.PNG' : 'assets/IMG_2057.PNG';
+        });
+
+        // Tabs
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.form').forEach(f => f.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(tab.dataset.tab + 'Form').classList.add('active');
+            });
+        });
+
+        // Password Strength
+        const registerPassword = document.getElementById('registerPassword');
+        registerPassword.addEventListener('input', () => {
+            const password = registerPassword.value;
+            const strength = document.getElementById('passwordStrength');
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+
+            if (!password) {
+                strength.classList.remove('show');
+                return;
+            }
+
+            strength.classList.add('show');
+            let score = 0;
+            if (password.length >= 8) score++;
+            if (password.match(/[a-z]+/)) score++;
+            if (password.match(/[A-Z]+/)) score++;
+            if (password.match(/[0-9]+/)) score++;
+            if (password.match(/[$@#&!]+/)) score++;
+
+            fill.style.width = (score / 5 * 100) + '%';
+            text.textContent = ['Очень слабый', 'Слабый', 'Средний', 'Хороший', 'Отличный'][score - 1] || 'Слабый';
+        });
+
+        // Notification
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            const icon = type === 'error' 
+                ? '<svg stroke="currentColor" viewBox="0 0 24 24" fill="none"><path d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>'
+                : '<svg stroke="currentColor" viewBox="0 0 24 24" fill="none"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>';
+
+            notification.innerHTML = `<div class="alert alert-${type}">${icon}<p class="alert-text">${message}</p></div>`;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 3500);
+        }
+
+        // Login
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+                showNotification('Вход выполнен', 'success');
+                setTimeout(() => window.location.href = 'index.html', 800);
+            } catch (error) {
+                let msg = 'Ошибка входа';
+                if (error.code === 'auth/user-not-found') msg = 'Пользователь не найден';
+                if (error.code === 'auth/wrong-password') msg = 'Неверный пароль';
+                if (error.code === 'auth/invalid-credential') msg = 'Неверные данные';
+                showNotification(msg, 'error');
+            }
+        });
+
+        // Register
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value.trim();
+            const email = document.getElementById('registerEmail').value.trim();
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerPasswordConfirm').value;
+
+            if (password !== confirm) {
+                showNotification('Пароли не совпадают', 'error');
+                return;
+            }
+
+            try {
+                const cred = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(cred.user, { displayName: name });
+                await setDoc(doc(db, 'users', cred.user.uid), {
+                    displayName: name,
+                    email: email,
+                    photoURL: null,
+                    createdAt: new Date().toISOString()
+                });
+                showNotification('Регистрация успешна', 'success');
+                setTimeout(() => window.location.href = 'index.html', 800);
+            } catch (error) {
+                let msg = 'Ошибка';
+                if (error.code === 'auth/email-already-in-use') msg = 'Email занят';
+                showNotification(msg, 'error');
+            }
+        });
+
+        // Google
+        [document.getElementById('loginGoogle'), document.getElementById('registerGoogle')].forEach(btn => {
+            btn.addEventListener('click', async () => {
+                try {
+                    const result = await signInWithPopup(auth, googleProvider);
+                    await setDoc(doc(db, 'users', result.user.uid), {
+                        displayName: result.user.displayName,
+                        email: result.user.email,
+                        photoURL: result.user.photoURL,
+                        createdAt: new Date().toISOString()
+                    }, { merge: true });
+                    showNotification('Успешно', 'success');
+                    setTimeout(() => window.location.href = 'index.html', 800);
+                } catch (error) {
+                    showNotification('Ошибка Google', 'error');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
